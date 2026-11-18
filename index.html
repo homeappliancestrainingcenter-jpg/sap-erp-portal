@@ -1,0 +1,2922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAP S/4HANA Fiori Enterprise Suite — Complete ERP</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --sap-shell-bg: #0a192f;
+            --sap-shell-text: #ffffff;
+            --sap-accent: #0070f2;
+            --sap-accent-hover: #0057c2;
+            --sap-accent-light: #ebf5fe;
+            --sap-bg: #f4f6f9;
+            --sap-card-bg: #ffffff;
+            --sap-border: #dce2ea;
+            --sap-text: #182433;
+        }
+
+        [data-theme="red-gold"] {
+            --sap-shell-bg: #290e13;
+            --sap-shell-text: #fff9ed;
+            --sap-accent: #b91c1c;
+            --sap-accent-hover: #991b1b;
+            --sap-accent-light: #fef2f2;
+            --sap-bg: #faf8f5;
+            --sap-card-bg: #ffffff;
+            --sap-border: #e6dcd1;
+            --sap-text: #291818;
+        }
+
+        body {
+            background-color: var(--sap-bg);
+            color: var(--sap-text);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.2s ease;
+        }
+
+        .sap-shell {
+            background-color: var(--sap-shell-bg);
+            color: var(--sap-shell-text);
+        }
+
+        .sap-btn-primary {
+            background-color: var(--sap-accent);
+            color: #ffffff;
+            transition: all 0.15s ease;
+        }
+        .sap-btn-primary:hover {
+            background-color: var(--sap-accent-hover);
+        }
+
+        .sap-card {
+            background-color: var(--sap-card-bg);
+            border: 1px solid var(--sap-border);
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 6px rgba(10, 25, 47, 0.04);
+        }
+
+        .sap-tile {
+            background-color: var(--sap-card-bg);
+            border: 1px solid var(--sap-border);
+            border-radius: 0.75rem;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .sap-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(10, 25, 47, 0.08);
+            border-color: var(--sap-accent);
+        }
+
+        .nav-item-active {
+            background-color: var(--sap-accent-light);
+            color: var(--sap-accent);
+            border-left: 3px solid var(--sap-accent);
+            font-weight: 600;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area {
+                position: fixed;
+                left: 0; top: 0; width: 100%;
+                background: white !important;
+                color: black !important;
+                padding: 20px;
+                z-index: 9999;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- TOP SAP FIORI SHELL BAR -->
+    <header class="sap-shell sticky top-0 z-40 shadow-md px-3 sm:px-5 h-14 flex items-center justify-between gap-2">
+        <!-- Left: Sidebar Toggle, SAP Branding & Company Profile -->
+        <div class="flex items-center gap-2.5">
+            <button id="sidebar-toggle" class="p-2 rounded-lg hover:bg-white/10 transition text-white" title="Toggle Navigation">
+                <i class="fa-solid fa-bars text-base"></i>
+            </button>
+            <div onclick="navigateTo('HOME')" class="flex items-center gap-2.5 cursor-pointer select-none">
+                <div class="bg-[#0070f2] text-white font-extrabold tracking-tighter px-2.5 py-1 rounded text-sm shadow-sm">
+                    SAP
+                </div>
+                <div class="hidden sm:flex flex-col">
+                    <span class="font-semibold text-xs sm:text-sm leading-tight">S/4HANA Enterprise Suite</span>
+                    <span id="header-company-name" class="text-[10px] opacity-75">Bharat Industrial & Tech Corp (1000)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center: Interactive SAP T-Code Command Bar + Cheat Sheet Trigger -->
+        <div class="relative flex-1 max-w-lg mx-1 sm:mx-3 flex items-center gap-1.5">
+            <div class="relative flex-1">
+                <div class="flex items-center bg-white/15 border border-white/20 rounded-lg px-2.5 py-1 focus-within:bg-white focus-within:text-slate-900 transition">
+                    <span class="text-[11px] font-mono font-bold opacity-75 mr-1.5 select-none">T-CODE</span>
+                    <input 
+                        type="text" 
+                        id="tcode-input" 
+                        placeholder="Type /N, VA01, CO01, QA01, LT01, CJ20N, SE38, SM21, IS01..." 
+                        class="bg-transparent w-full text-xs sm:text-sm font-mono uppercase focus:outline-none placeholder:normal-case placeholder:text-white/60 focus:placeholder:text-slate-400"
+                        autocomplete="off"
+                    >
+                    <button onclick="executeTCodeInput()" class="ml-1 px-2 py-0.5 rounded bg-white/20 hover:bg-blue-600 hover:text-white text-xs font-medium transition" title="Execute T-Code">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <!-- Autocomplete Dropdown -->
+                <div id="tcode-dropdown" class="hidden absolute left-0 right-0 mt-1.5 bg-white text-slate-800 rounded-lg shadow-2xl border border-slate-200 max-h-80 overflow-y-auto z-50 text-xs"></div>
+            </div>
+            <button onclick="openTCodeCheatSheet()" class="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-mono font-semibold text-white transition" title="All T-Codes Directory">
+                <i class="fa-solid fa-terminal"></i> T-Codes
+            </button>
+        </div>
+
+        <!-- Right: Global Search, Notification Bell, JSON Backup, Reset & Profile -->
+        <div class="flex items-center gap-1 sm:gap-2">
+            <button onclick="openGlobalSearch()" class="p-2 rounded-lg hover:bg-white/10 transition text-white/90 hover:text-white" title="Global ERP Search (Ctrl+K)">
+                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            </button>
+
+            <button onclick="openSystemNotifications()" class="relative p-2 rounded-lg hover:bg-white/10 transition text-white/90 hover:text-white" title="Live System Logs & Notifications">
+                <i class="fa-solid fa-bell text-sm"></i>
+                <span id="notif-badge" class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-400"></span>
+            </button>
+
+            <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-white/10 transition text-white/90 hover:text-white" title="Switch Theme (Horizon / Red-Gold)">
+                <i class="fa-solid fa-palette text-sm"></i>
+            </button>
+
+            <button onclick="exportFullJSONBackup()" class="hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-emerald-600/90 text-[11px] font-medium transition" title="Export Full ERP Backup (JSON)">
+                <i class="fa-solid fa-download"></i> JSON
+            </button>
+
+            <button onclick="confirmResetDemo()" class="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-rose-600/90 text-[11px] font-medium transition" title="Reset Demo Data">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+
+            <div onclick="openCompanySettingsModal()" class="flex items-center gap-2 pl-1.5 border-l border-white/20 cursor-pointer" title="Company Profile & Role">
+                <div class="w-8 h-8 rounded-full bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center shadow">
+                    SAP
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN BODY LAYOUT -->
+    <div class="flex flex-1 relative">
+
+        <!-- LEFT COLLAPSIBLE SIDEBAR (4 CATEGORIES) -->
+        <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col justify-between transition-all duration-200 z-30 fixed md:static inset-y-0 left-0 top-14 md:top-0 transform -translate-x-full md:translate-x-0">
+            <div class="p-3 space-y-4 overflow-y-auto">
+                
+                <!-- 1. CORE OVERVIEW -->
+                <div>
+                    <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        1. Core Overview
+                    </div>
+                    <button onclick="navigateTo('HOME')" data-nav="HOME" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition mt-0.5">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-grip w-4 text-center"></i> Fiori Launchpad</span>
+                        <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">/N</span>
+                    </button>
+                </div>
+
+                <!-- 2. FUNCTIONAL MODULES -->
+                <div>
+                    <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        2. Functional Modules
+                    </div>
+                    <div class="space-y-0.5 mt-0.5">
+                        <button onclick="navigateTo('SD')" data-nav="SD" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-cart-shopping w-4 text-center"></i> Sales & Billing (SD)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">VA01</span>
+                        </button>
+                        <button onclick="navigateTo('MM')" data-nav="MM" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-boxes-stacked w-4 text-center"></i> Materials Mgmt (MM)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">MMBE</span>
+                        </button>
+                        <button onclick="navigateTo('FICO')" data-nav="FICO" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-scale-balanced w-4 text-center"></i> Finance & GL (FICO)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">FB50</span>
+                        </button>
+                        <button onclick="navigateTo('PP')" data-nav="PP" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-industry w-4 text-center"></i> Production (PP)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">CO01</span>
+                        </button>
+                        <button onclick="navigateTo('QM')" data-nav="QM" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-microscope w-4 text-center"></i> Quality Mgmt (QM)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">QA01</span>
+                        </button>
+                        <button onclick="navigateTo('WM')" data-nav="WM" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-warehouse w-4 text-center"></i> Warehouse (WM/EWM)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">LT01</span>
+                        </button>
+                        <button onclick="navigateTo('PS')" data-nav="PS" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-diagram-project w-4 text-center"></i> Project System (PS)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">CJ20N</span>
+                        </button>
+                        <button onclick="navigateTo('HCM')" data-nav="HCM" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-users-gear w-4 text-center"></i> HR & Payroll (HCM)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">PA30</span>
+                        </button>
+                        <button onclick="navigateTo('PM')" data-nav="PM" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-screwdriver-wrench w-4 text-center"></i> Maint & CRM (PM)</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">IW31</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. TECHNICAL & ADMIN MODULES -->
+                <div>
+                    <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        3. Technical & Admin
+                    </div>
+                    <div class="space-y-0.5 mt-0.5">
+                        <button onclick="navigateTo('ABAP')" data-nav="ABAP" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-code w-4 text-center"></i> ABAP Workbench</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">SE38</span>
+                        </button>
+                        <button onclick="navigateTo('BASIS')" data-nav="BASIS" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-server w-4 text-center"></i> BASIS & Security</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">SM21</span>
+                        </button>
+                        <button onclick="navigateTo('BI')" data-nav="BI" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-line w-4 text-center"></i> BI / BW Analytics</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">RSA1</span>
+                        </button>
+                        <button onclick="navigateTo('PI')" data-nav="PI" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-network-wired w-4 text-center"></i> PI/PO API Hub</span>
+                            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">SXMB</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. INDUSTRY SOLUTIONS -->
+                <div>
+                    <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        4. Industry Solutions
+                    </div>
+                    <button onclick="navigateTo('IS')" data-nav="IS" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition mt-0.5">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-building-shield w-4 text-center"></i> IS-Retail / Health / Bank</span>
+                        <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">IS01</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="p-3 border-t border-slate-200 bg-slate-50 text-[11px]">
+                <div class="flex items-center justify-between text-slate-600 mb-1">
+                    <span>HANA DB: <strong class="font-mono text-slate-800">PRD-800</strong></span>
+                    <span class="flex items-center gap-1 text-emerald-600 font-semibold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> 99.98%
+                    </span>
+                </div>
+                <div class="text-slate-500 flex justify-between">
+                    <span>Currency: INR (₹)</span>
+                    <span>GST: 18%</span>
+                </div>
+                <div class="mt-2 flex gap-1.5 sm:hidden">
+                    <button onclick="exportFullJSONBackup()" class="flex-1 py-1.5 rounded bg-blue-100 text-blue-700 font-semibold">JSON</button>
+                    <button onclick="confirmResetDemo()" class="flex-1 py-1.5 rounded bg-rose-100 text-rose-700 font-semibold">Reset</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Backdrop -->
+        <div id="sidebar-backdrop" onclick="closeMobileSidebar()" class="hidden fixed inset-0 bg-slate-900/40 z-20 md:hidden"></div>
+
+        <!-- MAIN WORKSPACE -->
+        <main class="flex-1 p-4 sm:p-6 max-w-full overflow-x-hidden">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-5 pb-3 border-b border-slate-200">
+                <div>
+                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-0.5">
+                        <span>SAP S/4HANA 2026</span>
+                        <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                        <span id="breadcrumb-module" class="font-medium text-slate-700">Fiori Launchpad</span>
+                    </div>
+                    <h1 id="page-title" class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+                        Enterprise Command Center
+                    </h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-md bg-slate-200/80 text-slate-800 font-mono text-xs font-bold" id="active-tcode-badge">
+                        T-Code: /N
+                    </span>
+                    <button onclick="openTCodeCheatSheet()" class="px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold transition">
+                        17 Modules Active
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic View Container -->
+            <div id="app-view" class="space-y-6"></div>
+        </main>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="sap-toast-container" class="fixed bottom-4 left-4 right-4 sm:right-auto sm:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- UNIVERSAL MODAL -->
+    <div id="sap-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div id="sap-modal-content" class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"></div>
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * 1. MASTER T-CODE DIRECTORY & STATE INITIALIZATION
+         * ============================================================================
+         */
+        const STORAGE_KEY = 'SAP_S4HANA_COMPLETE_ERP_V2';
+
+        const TCODE_DIRECTORY = [
+            { code: '/N', module: 'HOME', cat: 'Core', title: 'Fiori Launchpad Home', desc: 'Executive KPIs, Charts & All Module Tiles' },
+            { code: 'VA01', module: 'SD', cat: 'Functional', title: 'Create Sales Order (SD)', desc: 'Multi-item Sales Order with Discount & 18% GST' },
+            { code: 'VF01', module: 'SD', cat: 'Functional', title: 'Billing & GST Invoice (SD)', desc: 'Post Goods Issue, Deduct Stock & Generate GST PDF' },
+            { code: 'ME21N', module: 'MM', cat: 'Functional', title: 'Purchase Order & MIGO (MM)', desc: 'Vendor Procurement & Goods Receipt Stock Update' },
+            { code: 'MMBE', module: 'MM', cat: 'Functional', title: 'Stock Overview & MM01 (MM)', desc: 'Raw Materials, Finished Goods & Valuation' },
+            { code: 'FB50', module: 'FICO', cat: 'Functional', title: 'General Ledger & P&L (FICO)', desc: 'Double-Entry Journal, Trial Balance & P&L Statement' },
+            { code: 'CO01', module: 'PP', cat: 'Functional', title: 'Production Orders & BOM (PP)', desc: 'Convert Raw Materials to Finished Goods' },
+            { code: 'QA01', module: 'QM', cat: 'Functional', title: 'Quality Inspection Lots (QM)', desc: 'Batch Quality Scoring & Usage Decision' },
+            { code: 'LT01', module: 'WM', cat: 'Functional', title: 'Warehouse Bin Transfer (WM/EWM)', desc: 'Storage Bin Capacity & Transfer Orders' },
+            { code: 'CJ20N', module: 'PS', cat: 'Functional', title: 'Project Builder & WBS (PS)', desc: 'WBS Budgets, Milestones & FICO Expense Sync' },
+            { code: 'PA30', module: 'HCM', cat: 'Functional', title: 'HR Master & Payroll (HCM)', desc: 'Employee Directory, Attendance & Payslip PDF' },
+            { code: 'IW31', module: 'PM', cat: 'Functional', title: 'Plant Maint & CRM Service (PM)', desc: 'Equipment Maintenance & Customer SLA Tickets' },
+            { code: 'SE38', module: 'ABAP', cat: 'Technical', title: 'ABAP Workbench & Query', desc: 'Live Table SQL/ABAP Query Runner & Syntax Check' },
+            { code: 'SM21', module: 'BASIS', cat: 'Technical', title: 'BASIS System & SU01 Security', desc: 'HANA CPU/RAM Health, User Roles & Audit Logs' },
+            { code: 'RSA1', module: 'BI', cat: 'Technical', title: 'BI / BW Analytics Warehouse', desc: 'Regional Sales, Product Margin & CSV Analytics' },
+            { code: 'SXMB_MONI', module: 'PI', cat: 'Technical', title: 'PI/PO/CPI Integration Monitor', desc: 'Live XML/JSON IDoc Sync (GSTN, E-Comm, Bank)' },
+            { code: 'IS01', module: 'IS', cat: 'Industry', title: 'Industry-Specific Solutions', desc: 'IS-Retail, IS-Healthcare, IS-Banking, IS-Utilities' }
+        ];
+
+        const DEFAULT_ERP_DATA = {
+            company: {
+                name: 'Bharat Industrial & Tech Corp',
+                code: '1000',
+                gstin: '29AAACB9988K1Z2',
+                city: 'Bengaluru, Karnataka'
+            },
+            counters: {
+                so: 100105,
+                inv: 900055,
+                po: 4500002015,
+                gl: 190000120,
+                prod: 6000304,
+                qm: 89000014,
+                wm: 3000412,
+                pm: 4000512
+            },
+            customers: [
+                { id: 'CUST-101', name: 'Tata Motors Ancillaries Ltd', region: 'West (Pune)', gstin: '27AAACT2727Q1Z5' },
+                { id: 'CUST-102', name: 'Infosys Campus Facilities', region: 'South (Bengaluru)', gstin: '29AAACI4798L1Z2' },
+                { id: 'CUST-103', name: 'Reliance Retail Supply Hub', region: 'West (Ahmedabad)', gstin: '24AAACR5055K1Z8' },
+                { id: 'CUST-104', name: 'Apollo Hospitals Enterprise', region: 'South (Chennai)', gstin: '33AAACA5443N1Z1' },
+                { id: 'CUST-105', name: 'Maruti Suzuki Vendor Park', region: 'North (Gurugram)', gstin: '06AAACM0829Q1Z9' }
+            ],
+            vendors: [
+                { id: 'VEND-501', name: 'Bosch India Industrial Supplies', city: 'Bengaluru' },
+                { id: 'VEND-502', name: 'Siemens Automation Systems', city: 'Mumbai' },
+                { id: 'VEND-503', name: 'JSW Precision Alloys Ltd', city: 'Ballari' }
+            ],
+            materials: [
+                { code: 'FG-1001', name: 'Smart Industrial Servo Drive 5kW', type: 'Finished Good', category: 'Automation', price: 45000, cost: 28000, stock: 24, reorder: 8, uom: 'NOS' },
+                { code: 'FG-1002', name: 'S7-1500 Edge PLC Controller', type: 'Finished Good', category: 'Electronics', price: 68000, cost: 42000, stock: 12, reorder: 6, uom: 'NOS' },
+                { code: 'FG-1003', name: 'CNC High-Torque Spindle Assembly', type: 'Finished Good', category: 'Machinery', price: 96000, cost: 61000, stock: 6, reorder: 5, uom: 'NOS' },
+                { code: 'RM-2001', name: 'Copper Winding Stator Core', type: 'Raw Material', category: 'Components', price: 9500, cost: 9500, stock: 65, reorder: 20, uom: 'NOS' },
+                { code: 'RM-2002', name: 'ARM Cortex Industrial PCB Board', type: 'Raw Material', category: 'Electronics', price: 11000, cost: 11000, stock: 48, reorder: 15, uom: 'NOS' },
+                { code: 'RM-2003', name: 'CNC Machined Aluminum Housing', type: 'Raw Material', category: 'Mechanical', price: 6500, cost: 6500, stock: 40, reorder: 12, uom: 'NOS' }
+            ],
+            boms: [
+                {
+                    bomId: 'BOM-01',
+                    finishedCode: 'FG-1001',
+                    finishedName: 'Smart Industrial Servo Drive 5kW',
+                    components: [
+                        { code: 'RM-2001', name: 'Copper Winding Stator Core', qtyPerUnit: 1 },
+                        { code: 'RM-2002', name: 'ARM Cortex Industrial PCB Board', qtyPerUnit: 1 },
+                        { code: 'RM-2003', name: 'CNC Machined Aluminum Housing', qtyPerUnit: 1 }
+                    ],
+                    laborCostPerUnit: 1000
+                },
+                {
+                    bomId: 'BOM-02',
+                    finishedCode: 'FG-1002',
+                    finishedName: 'S7-1500 Edge PLC Controller',
+                    components: [
+                        { code: 'RM-2002', name: 'ARM Cortex Industrial PCB Board', qtyPerUnit: 2 },
+                        { code: 'RM-2003', name: 'CNC Machined Aluminum Housing', qtyPerUnit: 1 }
+                    ],
+                    laborCostPerUnit: 1500
+                }
+            ],
+            salesOrders: [
+                {
+                    soNumber: 'SO-100102',
+                    date: '2026-11-12',
+                    customerId: 'CUST-101',
+                    customerName: 'Tata Motors Ancillaries Ltd',
+                    region: 'West (Pune)',
+                    items: [
+                        { code: 'FG-1001', name: 'Smart Industrial Servo Drive 5kW', qty: 4, price: 45000, discountPct: 5 }
+                    ],
+                    subtotal: 171000,
+                    gstAmount: 30780,
+                    totalAmount: 201780,
+                    status: 'Invoiced',
+                    invoiceNumber: 'INV-900053'
+                },
+                {
+                    soNumber: 'SO-100103',
+                    date: '2026-11-15',
+                    customerId: 'CUST-102',
+                    customerName: 'Infosys Campus Facilities',
+                    region: 'South (Bengaluru)',
+                    items: [
+                        { code: 'FG-1002', name: 'S7-1500 Edge PLC Controller', qty: 3, price: 68000, discountPct: 0 }
+                    ],
+                    subtotal: 204000,
+                    gstAmount: 36720,
+                    totalAmount: 240720,
+                    status: 'Invoiced',
+                    invoiceNumber: 'INV-900054'
+                },
+                {
+                    soNumber: 'SO-100104',
+                    date: '2026-11-17',
+                    customerId: 'CUST-105',
+                    customerName: 'Maruti Suzuki Vendor Park',
+                    region: 'North (Gurugram)',
+                    items: [
+                        { code: 'FG-1003', name: 'CNC High-Torque Spindle Assembly', qty: 2, price: 96000, discountPct: 2 }
+                    ],
+                    subtotal: 188160,
+                    gstAmount: 33869,
+                    totalAmount: 222029,
+                    status: 'Open',
+                    invoiceNumber: null
+                }
+            ],
+            purchaseOrders: [
+                {
+                    poNumber: '4500002013',
+                    date: '2026-11-10',
+                    vendorName: 'Bosch India Industrial Supplies',
+                    materialCode: 'RM-2001',
+                    materialName: 'Copper Winding Stator Core',
+                    qty: 25,
+                    unitCost: 9500,
+                    totalCost: 237500,
+                    status: 'Received (MIGO)'
+                },
+                {
+                    poNumber: '4500002014',
+                    date: '2026-11-16',
+                    vendorName: 'Siemens Automation Systems',
+                    materialCode: 'RM-2002',
+                    materialName: 'ARM Cortex Industrial PCB Board',
+                    qty: 20,
+                    unitCost: 11000,
+                    totalCost: 220000,
+                    status: 'Open PO'
+                }
+            ],
+            glEntries: [
+                { docNo: '190000115', date: '2026-11-01', account: '100000 - HDFC Corporate Bank', type: 'Asset', debit: 2500000, credit: 0, text: 'Opening Working Capital' },
+                { docNo: '190000115', date: '2026-11-01', account: '300000 - Share Capital Reserve', type: 'Equity', debit: 0, credit: 2500000, text: 'Opening Working Capital' },
+                { docNo: '190000116', date: '2026-11-10', account: '140100 - Raw Material Inventory', type: 'Asset', debit: 237500, credit: 0, text: 'MIGO GR PO 4500002013' },
+                { docNo: '190000116', date: '2026-11-10', account: '200100 - Accounts Payable (Vendors)', type: 'Liability', debit: 0, credit: 237500, text: 'Vendor Liability PO 4500002013' },
+                { docNo: '190000117', date: '2026-11-12', account: '120100 - Accounts Receivable', type: 'Asset', debit: 201780, credit: 0, text: 'SD Billing INV-900053' },
+                { docNo: '190000117', date: '2026-11-12', account: '400100 - Domestic Sales Revenue', type: 'Revenue', debit: 0, credit: 171000, text: 'Sales Revenue INV-900053' },
+                { docNo: '190000117', date: '2026-11-12', account: '220500 - Output GST Payable (18%)', type: 'Liability', debit: 0, credit: 30780, text: 'Output GST INV-900053' },
+                { docNo: '190000118', date: '2026-11-15', account: '120100 - Accounts Receivable', type: 'Asset', debit: 240720, credit: 0, text: 'SD Billing INV-900054' },
+                { docNo: '190000118', date: '2026-11-15', account: '400100 - Domestic Sales Revenue', type: 'Revenue', debit: 0, credit: 204000, text: 'Sales Revenue INV-900054' },
+                { docNo: '190000118', date: '2026-11-15', account: '220500 - Output GST Payable (18%)', type: 'Liability', debit: 0, credit: 36720, text: 'Output GST INV-900054' }
+            ],
+            productionOrders: [
+                { prodNo: 'PROD-6000302', date: '2026-11-13', finishedCode: 'FG-1001', finishedName: 'Smart Industrial Servo Drive 5kW', qty: 5, totalCost: 140000, status: 'Confirmed (TECO)' },
+                { prodNo: 'PROD-6000303', date: '2026-11-17', finishedCode: 'FG-1002', finishedName: 'S7-1500 Edge PLC Controller', qty: 4, totalCost: 120000, status: 'Released' }
+            ],
+            qualityLots: [
+                { lotNo: 'QM-89000012', date: '2026-11-10', sourceRef: 'PO 4500002013', materialCode: 'RM-2001', materialName: 'Copper Winding Stator Core', qty: 25, score: 98, decision: 'Accepted (Unrestricted)' },
+                { lotNo: 'QM-89000013', date: '2026-11-17', sourceRef: 'PROD-6000303', materialCode: 'FG-1002', materialName: 'S7-1500 Edge PLC Controller', qty: 4, score: null, decision: 'Pending Inspection' }
+            ],
+            warehouseBins: [
+                { binId: 'HR-01-A', storageType: 'High-Rack Storage', materialCode: 'FG-1001', materialName: 'Smart Industrial Servo Drive 5kW', qty: 16, maxCap: 40 },
+                { binId: 'HR-01-B', storageType: 'High-Rack Storage', materialCode: 'FG-1002', materialName: 'S7-1500 Edge PLC Controller', qty: 12, maxCap: 30 },
+                { binId: 'CS-02-A', storageType: 'Cold / ESD Sensitive', materialCode: 'RM-2002', materialName: 'ARM Cortex Industrial PCB Board', qty: 48, maxCap: 80 },
+                { binId: 'DZ-03-A', storageType: 'Dispatch Zone', materialCode: 'FG-1001', materialName: 'Smart Industrial Servo Drive 5kW', qty: 8, maxCap: 25 }
+            ],
+            wmTransfers: [
+                { toNo: 'TO-3000411', date: '2026-11-14', fromBin: 'HR-01-A', toBin: 'DZ-03-A', materialName: 'Smart Industrial Servo Drive 5kW', qty: 8, status: 'Confirmed' }
+            ],
+            projects: [
+                {
+                    wbsId: 'WBS-1001',
+                    name: 'Smart Factory IoT & ERP Rollout — Plant 2',
+                    manager: 'Vikramaditya Nair',
+                    budget: 1200000,
+                    actualSpend: 740000,
+                    progress: 68,
+                    milestone: 'UAT & Integration Testing',
+                    status: 'In Progress'
+                },
+                {
+                    wbsId: 'WBS-1002',
+                    name: 'Automated CNC Assembly Line Commissioning',
+                    manager: 'Ananya Deshmukh',
+                    budget: 850000,
+                    actualSpend: 810000,
+                    progress: 92,
+                    milestone: 'Final Quality Sign-Off',
+                    status: 'Near Completion'
+                }
+            ],
+            employees: [
+                { id: 'EMP-9001', name: 'Ananya Deshmukh', role: 'Lead SAP FICO Architect', dept: 'Finance', baseSalary: 125000, workingDays: 26, presentDays: 26, presentToday: true },
+                { id: 'EMP-9002', name: 'Vikramaditya Nair', role: 'Plant Supply Chain Head', dept: 'Operations', baseSalary: 105000, workingDays: 26, presentDays: 25, presentToday: true },
+                { id: 'EMP-9003', name: 'Siddharth Kulkarni', role: 'Senior Field Service Engg', dept: 'Maintenance', baseSalary: 72000, workingDays: 26, presentDays: 24, presentToday: true },
+                { id: 'EMP-9004', name: 'Priya Venkatesh', role: 'Enterprise Account Director', dept: 'Sales', baseSalary: 88000, workingDays: 26, presentDays: 25, presentToday: false }
+            ],
+            serviceOrders: [
+                {
+                    orderNo: 'PM-4000510',
+                    date: '2026-11-14',
+                    customerName: 'Tata Motors Ancillaries Ltd',
+                    equipment: 'CNC Spindle Unit #04',
+                    issue: 'Preventive Vibration Calibration & Bearing Check',
+                    priority: 'High',
+                    technician: 'Siddharth Kulkarni',
+                    spareCode: 'RM-2003',
+                    spareQty: 1,
+                    serviceFee: 24000,
+                    status: 'Completed'
+                },
+                {
+                    orderNo: 'PM-4000511',
+                    date: '2026-11-17',
+                    customerName: 'Apollo Hospitals Enterprise',
+                    equipment: 'Backup Power PLC Panel',
+                    issue: 'Emergency Firmware Patch & Load Failover Test',
+                    priority: 'Critical',
+                    technician: 'Vikramaditya Nair',
+                    spareCode: 'RM-2002',
+                    spareQty: 1,
+                    serviceFee: 35000,
+                    status: 'In Progress'
+                }
+            ],
+            basisUsers: [
+                { userId: 'RKUMAR', name: 'Ramesh Kumar', role: 'SAP_ALL (Super Admin)', active: true, lastLogin: '2026-11-17 09:45' },
+                { userId: 'ADESHMUKH', name: 'Ananya Deshmukh', role: 'SAP_FICO_ACCOUNTANT', active: true, lastLogin: '2026-11-17 10:02' },
+                { userId: 'VNAIR', name: 'Vikramaditya Nair', role: 'SAP_MM_PP_BUYER', active: true, lastLogin: '2026-11-17 08:30' },
+                { userId: 'PVENKATESH', name: 'Priya Venkatesh', role: 'SAP_SD_SALES_AGENT', active: true, lastLogin: '2026-11-16 18:15' }
+            ],
+            systemLogs: [
+                { time: '10:15:04', code: 'SM21-001', level: 'INFO', msg: 'HANA In-Memory Database Backup checkpoint completed (0.42s).' },
+                { time: '10:02:19', code: 'SU01-204', level: 'SUCCESS', msg: 'User ADESHMUKH authenticated via SAP Fiori SSO.' },
+                { time: '09:30:00', code: 'SXMB-108', level: 'INFO', msg: 'GSTN E-Invoice API heartbeat verified (HTTP 200 OK).' }
+            ],
+            piMessages: [
+                { msgId: 'IDOC-77001', time: '2026-11-17 10:10', interfaceName: 'GSTN_EINVOICE_OUT', direction: 'Outbound', system: 'NIC GST Portal', status: '200 OK', payload: '{"irn":"98a7f6e5d4c3b2a1","docNo":"INV-900054","gstAmount":36720,"status":"ACT"}' },
+                { msgId: 'IDOC-77002', time: '2026-11-17 09:42', interfaceName: 'ECOMM_ORDER_IN', direction: 'Inbound', system: 'B2B Portal', status: '200 OK', payload: '{"orderRef":"WEB-8841","customer":"CUST-105","sku":"FG-1003","qty":2}' },
+                { msgId: 'IDOC-77003', time: '2026-11-16 17:55', interfaceName: 'HDFC_NEFT_PAY_OUT', direction: 'Outbound', system: 'HDFC Host-to-Host', status: '200 OK', payload: '{"batchId":"PAY-NOV26","records":4,"currency":"INR","mode":"NEFT"}' }
+            ],
+            industryData: {
+                retailPos: [
+                    { txId: 'POS-901', store: 'Bengaluru Indiranagar Flagship', items: 4, amount: 18450, payment: 'UPI / QR' },
+                    { txId: 'POS-902', store: 'Mumbai Bandra West Store', items: 2, amount: 9200, payment: 'Credit Card' }
+                ],
+                healthcarePatients: [
+                    { uhid: 'UHID-4401', patient: 'Meera Krishnamurthy', dept: 'Cardiology', bill: 48500, status: 'Insured / Cleared' },
+                    { uhid: 'UHID-4402', patient: 'Rajeshwar Sharma', dept: 'Orthopedics', bill: 32000, status: 'Pending Discharge' }
+                ],
+                bankingAccounts: [
+                    { acctNo: 'SB-10089421', holder: 'Kaveri Agro Exports Pvt Ltd', type: 'Working Capital OD', balance: 1450000, rate: '8.75%' },
+                    { acctNo: 'LN-20045110', holder: 'Nandi Tech Parks LLP', type: 'Term Loan', balance: 4200000, rate: '9.10%' }
+                ],
+                utilitiesMeters: [
+                    { meterNo: 'MTR-KA-7812', consumer: 'Electronic City IT Zone B', unitsKwh: 14250, bill: 114000, status: 'Grid Normal' },
+                    { meterNo: 'MTR-KA-7819', consumer: 'Peenya Industrial Shed 14', unitsKwh: 8900, bill: 71200, status: 'Maintenance Due' }
+                ]
+            }
+        };
+
+        let erpState = loadState();
+        let currentModule = 'HOME';
+        let currentTheme = localStorage.getItem('SAP_THEME_V2') || 'horizon';
+        let activeIndustryTab = 'RETAIL';
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) {
+                    const fresh = JSON.parse(JSON.stringify(DEFAULT_ERP_DATA));
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+                    return fresh;
+                }
+                return JSON.parse(raw);
+            } catch (e) {
+                return JSON.parse(JSON.stringify(DEFAULT_ERP_DATA));
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(erpState));
+            } catch (e) {
+                showToast('Storage warning: Could not save to browser LocalStorage.', 'error');
+            }
+        }
+
+        function addSystemLog(code, level, msg) {
+            const now = new Date().toTimeString().split(' ')[0];
+            erpState.systemLogs.unshift({ time: now, code, level, msg });
+            if (erpState.systemLogs.length > 30) erpState.systemLogs.pop();
+            saveState();
+        }
+
+        /**
+         * ============================================================================
+         * 2. FORMATTING & TOAST NOTIFICATIONS
+         * ============================================================================
+         */
+        function formatINR(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(amount || 0);
+        }
+
+        function todayISO() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('sap-toast-container');
+            const toast = document.createElement('div');
+            const styles = {
+                success: 'bg-slate-900 text-white border-l-4 border-emerald-400',
+                error: 'bg-rose-950 text-white border-l-4 border-rose-500',
+                info: 'bg-blue-950 text-white border-l-4 border-blue-400'
+            };
+            const icons = {
+                success: 'fa-circle-check text-emerald-400',
+                error: 'fa-circle-exclamation text-rose-400',
+                info: 'fa-circle-info text-blue-400'
+            };
+
+            toast.className = `pointer-events-auto ${styles[type] || styles.success} px-4 py-3 rounded-lg shadow-xl text-xs sm:text-sm flex items-start gap-3 transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icons[type] || icons.success} mt-0.5 text-base"></i>
+                <div class="flex-1 leading-snug">${message}</div>
+            `;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 4200);
+        }
+
+        /**
+         * ============================================================================
+         * 3. THEME, T-CODE ENGINE & NAVIGATION
+         * ============================================================================
+         */
+        function applyTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem('SAP_THEME_V2', theme);
+            if (theme === 'red-gold') {
+                document.documentElement.setAttribute('data-theme', 'red-gold');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        }
+
+        function toggleTheme() {
+            const next = currentTheme === 'horizon' ? 'red-gold' : 'horizon';
+            applyTheme(next);
+            showToast(`Theme switched to ${next === 'red-gold' ? 'Corporate Red-Gold' : 'SAP Fiori Horizon Blue'}.`, 'info');
+        }
+
+        function navigateTo(moduleKey, tcodeOverride = null) {
+            currentModule = moduleKey;
+            closeMobileSidebar();
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('nav-item-active', btn.dataset.nav === moduleKey);
+            });
+
+            const meta = {
+                HOME: { crumb: 'Core Overview', title: 'Fiori Launchpad Command Center', tcode: '/N' },
+                SD: { crumb: 'Functional • SD', title: 'Sales & Distribution (Orders & GST Billing)', tcode: tcodeOverride || 'VA01 / VF01' },
+                MM: { crumb: 'Functional • MM', title: 'Materials Management (Inventory & Procurement)', tcode: tcodeOverride || 'MMBE / ME21N' },
+                FICO: { crumb: 'Functional • FICO', title: 'Financial Accounting & Controlling', tcode: tcodeOverride || 'FB50' },
+                PP: { crumb: 'Functional • PP', title: 'Production Planning & Bill of Materials', tcode: tcodeOverride || 'CO01' },
+                QM: { crumb: 'Functional • QM', title: 'Quality Management & Batch Inspection', tcode: tcodeOverride || 'QA01' },
+                WM: { crumb: 'Functional • WM/EWM', title: 'Extended Warehouse & Bin Management', tcode: tcodeOverride || 'LT01' },
+                PS: { crumb: 'Functional • PS', title: 'Project System & WBS Cost Control', tcode: tcodeOverride || 'CJ20N' },
+                HCM: { crumb: 'Functional • HCM', title: 'Human Capital Management & Payroll', tcode: tcodeOverride || 'PA30' },
+                PM: { crumb: 'Functional • PM & CRM', title: 'Plant Maintenance & Customer Service', tcode: tcodeOverride || 'IW31' },
+                ABAP: { crumb: 'Technical • ABAP', title: 'ABAP Workbench & Live HANA Query Runner', tcode: tcodeOverride || 'SE38' },
+                BASIS: { crumb: 'Technical • BASIS', title: 'SAP BASIS System Monitor & SU01 Security', tcode: tcodeOverride || 'SM21 / SU01' },
+                BI: { crumb: 'Technical • BI/BW', title: 'Business Intelligence & Data Warehouse', tcode: tcodeOverride || 'RSA1' },
+                PI: { crumb: 'Technical • PI/PO/CPI', title: 'Enterprise API & IDoc Integration Monitor', tcode: tcodeOverride || 'SXMB_MONI' },
+                IS: { crumb: 'Industry Solutions', title: 'Industry-Specific Vertical Solutions', tcode: tcodeOverride || 'IS01' }
+            };
+
+            const info = meta[moduleKey] || meta.HOME;
+            document.getElementById('breadcrumb-module').textContent = info.crumb;
+            document.getElementById('page-title').textContent = info.title;
+            document.getElementById('active-tcode-badge').textContent = `T-Code: ${info.tcode}`;
+            document.getElementById('header-company-name').textContent = `${erpState.company.name} (${erpState.company.code})`;
+
+            renderCurrentModule();
+        }
+
+        // T-Code Bar Autocomplete & Execution
+        const tcodeInput = document.getElementById('tcode-input');
+        const tcodeDropdown = document.getElementById('tcode-dropdown');
+
+        tcodeInput.addEventListener('focus', () => renderTCodeDropdown(tcodeInput.value));
+        tcodeInput.addEventListener('input', () => renderTCodeDropdown(tcodeInput.value));
+        tcodeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                executeTCodeInput();
+            } else if (e.key === 'Escape') {
+                tcodeDropdown.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!tcodeInput.contains(e.target) && !tcodeDropdown.contains(e.target)) {
+                tcodeDropdown.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                openGlobalSearch();
+            }
+        });
+
+        function renderTCodeDropdown(query) {
+            const q = (query || '').trim().toUpperCase();
+            const matches = TCODE_DIRECTORY.filter(item =>
+                item.code.includes(q) || item.title.toUpperCase().includes(q) || item.cat.toUpperCase().includes(q)
+            );
+            if (!matches.length) {
+                tcodeDropdown.classList.add('hidden');
+                return;
+            }
+            tcodeDropdown.innerHTML = matches.map(item => `
+                <button onclick="selectTCode('${item.code}')" class="w-full text-left px-3 py-2 hover:bg-blue-50 border-b border-slate-100 last:border-none flex items-center justify-between gap-2 transition">
+                    <div>
+                        <span class="font-mono font-bold text-blue-700 mr-2">${item.code}</span>
+                        <span class="font-semibold text-slate-800">${item.title}</span>
+                        <div class="text-[11px] text-slate-500">${item.desc}</div>
+                    </div>
+                    <span class="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">${item.cat}</span>
+                </button>
+            `).join('');
+            tcodeDropdown.classList.remove('hidden');
+        }
+
+        function selectTCode(code) {
+            tcodeInput.value = '';
+            tcodeDropdown.classList.add('hidden');
+            const match = TCODE_DIRECTORY.find(t => t.code === code);
+            if (match) {
+                navigateTo(match.module, match.code);
+                showToast(`Executed ${match.code}: ${match.title}`, 'info');
+            }
+        }
+
+        function executeTCodeInput() {
+            const raw = tcodeInput.value.trim().toUpperCase();
+            if (!raw) return;
+            const cleaned = raw.startsWith('/N') && raw.length > 2 ? raw.slice(2) : raw;
+            const match = TCODE_DIRECTORY.find(t => t.code === raw || t.code === cleaned || t.module === cleaned);
+            tcodeDropdown.classList.add('hidden');
+            tcodeInput.value = '';
+
+            if (match) {
+                navigateTo(match.module, match.code);
+                showToast(`Transaction ${match.code} started.`, 'info');
+            } else {
+                showToast(`Transaction "${raw}" unknown. Click "T-Codes" button for all 17 commands.`, 'error');
+            }
+        }
+
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            const sb = document.getElementById('sidebar');
+            const bd = document.getElementById('sidebar-backdrop');
+            if (window.innerWidth < 768) {
+                sb.classList.toggle('-translate-x-full');
+                bd.classList.toggle('hidden');
+            } else {
+                sb.classList.toggle('hidden');
+            }
+        });
+
+        function closeMobileSidebar() {
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-backdrop').classList.add('hidden');
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 4. AGGREGATION & METRICS ENGINE
+         * ============================================================================
+         */
+        function getERPMetrics() {
+            let revenue = 0, expense = 0, receivables = 0, payables = 0;
+            erpState.glEntries.forEach(e => {
+                if (e.type === 'Revenue') revenue += (e.credit - e.debit);
+                if (e.type === 'Expense') expense += (e.debit - e.credit);
+                if (e.account.startsWith('120100')) receivables += (e.debit - e.credit);
+                if (e.account.startsWith('200100')) payables += (e.credit - e.debit);
+            });
+            const stockValue = erpState.materials.reduce((sum, m) => sum + (m.price * m.stock), 0);
+            const openSO = erpState.salesOrders.filter(s => s.status === 'Open').length;
+            const activeProd = erpState.productionOrders.filter(p => p.status !== 'Confirmed (TECO)').length;
+            const pendingQM = erpState.qualityLots.filter(q => q.decision === 'Pending Inspection').length;
+
+            return {
+                revenue,
+                expense,
+                netProfit: revenue - expense,
+                receivables,
+                payables,
+                stockValue,
+                openSO,
+                activeProd,
+                pendingQM
+            };
+        }
+
+        /**
+         * ============================================================================
+         * 5. MASTER ROUTER
+         * ============================================================================
+         */
+        function renderCurrentModule() {
+            const view = document.getElementById('app-view');
+            const map = {
+                HOME: renderLaunchpad,
+                SD: renderSDModule,
+                MM: renderMMModule,
+                FICO: renderFICOModule,
+                PP: renderPPModule,
+                QM: renderQMModule,
+                WM: renderWMModule,
+                PS: renderPSModule,
+                HCM: renderHCMModule,
+                PM: renderPMModule,
+                ABAP: renderABAPModule,
+                BASIS: renderBASISModule,
+                BI: renderBIModule,
+                PI: renderPIModule,
+                IS: renderISModule
+            };
+            (map[currentModule] || renderLaunchpad)(view);
+        }
+
+        /* --------------------------------------------------------------------------
+         * 1. FIORI LAUNCHPAD (/N)
+         * -------------------------------------------------------------------------- */
+        function renderLaunchpad(container) {
+            const m = getERPMetrics();
+
+            container.innerHTML = `
+                <!-- 6 Executive KPI Tiles -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
+                    <div onclick="navigateTo('FICO')" class="sap-tile p-4 cursor-pointer">
+                        <div class="flex justify-between items-center text-[11px] text-slate-500">
+                            <span>Total Revenue</span>
+                            <span class="font-mono text-emerald-700 bg-emerald-50 px-1.5 rounded">FICO</span>
+                        </div>
+                        <div class="text-lg font-bold font-mono text-slate-900 mt-1">${formatINR(m.revenue)}</div>
+                        <div class="text-[11px] text-emerald-600 mt-1">Net P&L: ${formatINR(m.netProfit)}</div>
+                    </div>
+
+                    <div onclick="navigateTo('SD')" class="sap-tile p-4 cursor-pointer">
+                        <div class="flex justify-between items-center text-[11px] text-slate-500">
+                            <span>Open Sales Orders</span>
+                            <span class="font-mono text-blue-700 bg-blue-50 px-1.5 rounded">VA01</span>
+                        </div>
+                        <div class="text-lg font-bold font-mono text-slate-900 mt-1">${m.openSO} Order(s)</div>
+                        <div class="text-[11px] text-slate-500 mt-1">AR: ${formatINR(m.receivables)}</div>
+                    </div>
+
+                    <div onclick="navigateTo('MM')" class="sap-tile p-4 cursor-pointer">
+                        <div class="flex justify-between items-center text-[11px] text-slate-500">
+                            <span>Warehouse Stock</span>
+                            <span class="font-mono text-indigo-700 bg-indigo-50 px-1.5 rounded">MMBE</span>
+                        </div>
+                        <div class="text-lg font-bold font-mono text-slate-900 mt-1">${formatINR(m.stockValue)}</div>
+                        <div class="text-[11px] text-slate-500 mt-1">${erpState.materials.length} Active SKUs</div>
+                    </div>
+
+                    <div onclick="navigateTo('PP')" class="sap-tile p-4 cursor-pointer">
+                        <div class="flex justify-between items-center text-[11px] text-slate-500">
+                            <span>Production Runs</span>
+                            <span class="font-mono text-amber-700 bg-amber-50 px-1.5 rounded">CO01</span>
+                        </div>
+                        <div class="text-lg font-bold font-mono text-slate-900 mt-1">${m.activeProd} Active</div>
+                        <div class="text-[11px] text-slate-500 mt-1">${erpState.boms.length} BOM Recipes</div>
+                    </div>
+
+                    <div onclick="navigateTo('QM')" class="sap-tile p-4 cursor-pointer">
+                        <div class="flex justify-between items-center text-[11px] text-slate-500">
+                            <span>Quality Inspections</span>
+                            <span class="font-mono text-purple-700 bg-purple-50 px-1.5 rounded">QA01</span>
+                        </div>
+                        <div class="text-lg font-bold font-mono text-slate-900 mt-1">${m.pendingQM} Pending</div>
+                        <div class="text-[11px] text-slate-500 mt-1">${erpState.qualityLots.length} Total Lots</div>
+                    </div>
+
+                    <div onclick="navigateTo('BASIS')" class="sap-tile p-4 cursor-pointer">
+                        <div class="flex justify-between items-center text-[11px] text-slate-500">
+                            <span>HANA System Health</span>
+                            <span class="font-mono text-emerald-700 bg-emerald-50 px-1.5 rounded">SM21</span>
+                        </div>
+                        <div class="text-lg font-bold font-mono text-emerald-600 mt-1">99.98% OK</div>
+                        <div class="text-[11px] text-slate-500 mt-1">Latency: 14 ms</div>
+                    </div>
+                </div>
+
+                <!-- Interactive Analytics + Quick All-Module Launchpad Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <!-- SVG Revenue vs Expense Chart -->
+                    <div class="sap-card p-5 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-900">Real-Time FICO P&L Overview</h3>
+                            <p class="text-xs text-slate-500">Auto-updated from SD, MM, PP, PS & HCM</p>
+                        </div>
+                        <div class="my-3 flex justify-center">
+                            ${renderBarChartSVG(m.revenue, m.expense, Math.max(0, m.netProfit))}
+                        </div>
+                        <div class="grid grid-cols-3 text-center text-[11px] pt-2 border-t border-slate-100">
+                            <div><span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1"></span>Revenue</div>
+                            <div><span class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-1"></span>Expense</div>
+                            <div><span class="inline-block w-2 h-2 rounded-full bg-blue-600 mr-1"></span>Net Profit</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Module Tiles Grid -->
+                    <div class="sap-card p-5 lg:col-span-2">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-sm text-slate-900">All SAP S/4HANA Functional, Technical & Industry Tiles</h3>
+                            <span class="text-[11px] text-slate-500">Click any tile to launch</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 text-xs">
+                            ${TCODE_DIRECTORY.filter(t => t.code !== '/N' && t.code !== 'VF01').map(t => `
+                                <button onclick="navigateTo('${t.module}', '${t.code}')" class="p-3 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 text-left transition flex flex-col justify-between">
+                                    <div class="flex items-center justify-between w-full mb-1">
+                                        <span class="font-mono font-bold text-[11px] text-blue-700">${t.code}</span>
+                                        <span class="text-[9px] uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">${t.cat}</span>
+                                    </div>
+                                    <div class="font-semibold text-slate-800 line-clamp-1">${t.title.split('(')[0]}</div>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBarChartSVG(rev, exp, profit) {
+            const maxVal = Math.max(rev, exp, profit, 100000);
+            const hRev = Math.max(14, Math.round((rev / maxVal) * 110));
+            const hExp = Math.max(14, Math.round((exp / maxVal) * 110));
+            const hProf = Math.max(14, Math.round((profit / maxVal) * 110));
+            return `
+                <svg viewBox="0 0 240 145" class="w-full max-w-[250px] h-36">
+                    <line x1="15" y1="128" x2="225" y2="128" stroke="#cbd5e1" stroke-width="1.5" />
+                    <rect x="35" y="${128 - hRev}" width="38" height="${hRev}" rx="4" fill="#10b981" />
+                    <text x="54" y="${122 - hRev}" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#065f46">₹${Math.round(rev/1000)}k</text>
+                    <rect x="101" y="${128 - hExp}" width="38" height="${hExp}" rx="4" fill="#f43f5e" />
+                    <text x="120" y="${122 - hExp}" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#9f1239">₹${Math.round(exp/1000)}k</text>
+                    <rect x="167" y="${128 - hProf}" width="38" height="${hProf}" rx="4" fill="#0070f2" />
+                    <text x="186" y="${122 - hProf}" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#1e40af">₹${Math.round(profit/1000)}k</text>
+                </svg>
+            `;
+        }
+
+        /* --------------------------------------------------------------------------
+         * 2. SALES & DISTRIBUTION (SD — VA01 & VF01 MULTI-LINE + DISCOUNT + 18% GST)
+         * -------------------------------------------------------------------------- */
+        let draftSOItems = [{ code: 'FG-1001', qty: 1, discountPct: 0 }];
+
+        function renderSDModule(container) {
+            const finishedGoods = erpState.materials.filter(m => m.type === 'Finished Good' || m.price > 0);
+
+            container.innerHTML = `
+                <div class="sap-card p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-2 border-b border-slate-100">
+                        <div>
+                            <h2 class="font-bold text-base text-slate-900">Create Multi-Item Sales Order (VA01)</h2>
+                            <p class="text-xs text-slate-500">Add multiple line items, apply item discounts, and auto-calculate 18% GST.</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded bg-blue-50 text-blue-700 font-mono text-xs font-bold">Next Doc: SO-${erpState.counters.so}</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Sold-To Customer</label>
+                            <select id="sd-customer" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                ${erpState.customers.map(c => `<option value="${c.id}">${c.name} — ${c.region}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="flex items-end justify-end">
+                            <button type="button" onclick="addDraftSOLine()" class="px-3 py-2 rounded-lg border border-blue-600 text-blue-700 hover:bg-blue-50 font-semibold">
+                                <i class="fa-solid fa-plus mr-1"></i> Add Line Item
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Line Items Table -->
+                    <div class="overflow-x-auto border border-slate-200 rounded-lg mb-4">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                <tr>
+                                    <th class="p-2.5">Material SKU</th>
+                                    <th class="p-2.5 w-24">Qty</th>
+                                    <th class="p-2.5 w-28">Discount %</th>
+                                    <th class="p-2.5 text-right">Line Net (INR)</th>
+                                    <th class="p-2.5 text-center w-14">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sd-draft-lines" class="divide-y divide-slate-100">
+                                ${renderDraftSOLinesHTML(finishedGoods)}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                        <div id="sd-draft-summary" class="text-xs font-mono text-slate-700"></div>
+                        <button onclick="saveMultiItemSalesOrder()" class="sap-btn-primary px-5 py-2.5 rounded-lg text-xs font-semibold shadow-xs">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Save Sales Order (VA01)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sales Orders & Billing Register -->
+                <div class="sap-card p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h3 class="font-bold text-base text-slate-900">Sales Order & Billing Register (VF01)</h3>
+                        <button onclick="exportCSV('sales')" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-xs font-medium">
+                            <i class="fa-solid fa-file-csv mr-1"></i> Export SD CSV
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">SO Number</th>
+                                    <th class="p-3">Customer</th>
+                                    <th class="p-3">Line Items</th>
+                                    <th class="p-3 text-right">Taxable</th>
+                                    <th class="p-3 text-right">GST (18%)</th>
+                                    <th class="p-3 text-right">Grand Total</th>
+                                    <th class="p-3 text-center">Status</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.salesOrders.slice().reverse().map(so => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3 font-mono font-bold text-blue-700">${so.soNumber}<div class="text-[10px] text-slate-400 font-normal">${so.date}</div></td>
+                                        <td class="p-3 font-medium text-slate-900">${so.customerName}</td>
+                                        <td class="p-3 text-slate-600">${so.items.map(i => `${i.name} (×${i.qty})`).join(', ')}</td>
+                                        <td class="p-3 font-mono text-right">${formatINR(so.subtotal)}</td>
+                                        <td class="p-3 font-mono text-right">${formatINR(so.gstAmount)}</td>
+                                        <td class="p-3 font-mono text-right font-bold text-slate-900">${formatINR(so.totalAmount)}</td>
+                                        <td class="p-3 text-center">
+                                            ${so.status === 'Invoiced'
+                                                ? `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">${so.invoiceNumber}</span>`
+                                                : `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold text-[11px]">Open</span>`
+                                            }
+                                        </td>
+                                        <td class="p-3 text-right">
+                                            ${so.status === 'Open'
+                                                ? `<button onclick="postSalesBilling('${so.soNumber}')" class="sap-btn-primary px-2.5 py-1 rounded text-[11px] font-semibold">Post Goods Issue & Invoice (VF01)</button>`
+                                                : `<button onclick="openGSTInvoiceModal('${so.soNumber}')" class="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-[11px] font-semibold"><i class="fa-solid fa-print mr-1"></i> GST Invoice</button>`
+                                            }
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            updateDraftSOSummary();
+        }
+
+        function renderDraftSOLinesHTML(materials) {
+            return draftSOItems.map((line, idx) => {
+                const mat = materials.find(m => m.code === line.code) || materials[0];
+                const net = Math.round(mat.price * line.qty * (1 - (line.discountPct || 0) / 100));
+                return `
+                    <tr>
+                        <td class="p-2">
+                            <select onchange="updateDraftSOLine(${idx}, 'code', this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded bg-white">
+                                ${materials.map(m => `<option value="${m.code}" ${m.code === line.code ? 'selected' : ''}>${m.code} - ${m.name} (${formatINR(m.price)} | Stock: ${m.stock})</option>`).join('')}
+                            </select>
+                        </td>
+                        <td class="p-2">
+                            <input type="number" min="1" value="${line.qty}" onchange="updateDraftSOLine(${idx}, 'qty', parseInt(this.value)||1)" class="w-full px-2 py-1.5 font-mono border border-slate-300 rounded">
+                        </td>
+                        <td class="p-2">
+                            <input type="number" min="0" max="50" value="${line.discountPct}" onchange="updateDraftSOLine(${idx}, 'discountPct', parseFloat(this.value)||0)" class="w-full px-2 py-1.5 font-mono border border-slate-300 rounded">
+                        </td>
+                        <td class="p-2 text-right font-mono font-semibold">${formatINR(net)}</td>
+                        <td class="p-2 text-center">
+                            ${draftSOItems.length > 1 ? `<button onclick="removeDraftSOLine(${idx})" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>` : '-'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function addDraftSOLine() {
+            draftSOItems.push({ code: 'FG-1002', qty: 1, discountPct: 0 });
+            renderCurrentModule();
+        }
+
+        function removeDraftSOLine(idx) {
+            draftSOItems.splice(idx, 1);
+            renderCurrentModule();
+        }
+
+        function updateDraftSOLine(idx, field, val) {
+            draftSOItems[idx][field] = val;
+            renderCurrentModule();
+        }
+
+        function updateDraftSOSummary() {
+            const el = document.getElementById('sd-draft-summary');
+            if (!el) return;
+            let subtotal = 0;
+            draftSOItems.forEach(line => {
+                const mat = erpState.materials.find(m => m.code === line.code);
+                if (mat) subtotal += Math.round(mat.price * line.qty * (1 - (line.discountPct || 0) / 100));
+            });
+            const gst = Math.round(subtotal * 0.18);
+            el.innerHTML = `Taxable: <strong>${formatINR(subtotal)}</strong> + GST (18%): <strong>${formatINR(gst)}</strong> = Grand Total: <strong class="text-blue-700 text-sm">${formatINR(subtotal + gst)}</strong>`;
+        }
+
+        function saveMultiItemSalesOrder() {
+            const custId = document.getElementById('sd-customer').value;
+            const customer = erpState.customers.find(c => c.id === custId);
+            if (!customer) return;
+
+            let subtotal = 0;
+            const items = draftSOItems.map(line => {
+                const mat = erpState.materials.find(m => m.code === line.code);
+                const lineNet = Math.round(mat.price * line.qty * (1 - (line.discountPct || 0) / 100));
+                subtotal += lineNet;
+                return { code: mat.code, name: mat.name, qty: line.qty, price: mat.price, discountPct: line.discountPct || 0 };
+            });
+
+            const gstAmount = Math.round(subtotal * 0.18);
+            const soNumber = `SO-${erpState.counters.so++}`;
+
+            erpState.salesOrders.push({
+                soNumber,
+                date: todayISO(),
+                customerId: customer.id,
+                customerName: customer.name,
+                region: customer.region,
+                items,
+                subtotal,
+                gstAmount,
+                totalAmount: subtotal + gstAmount,
+                status: 'Open',
+                invoiceNumber: null
+            });
+
+            draftSOItems = [{ code: 'FG-1001', qty: 1, discountPct: 0 }];
+            saveState();
+            addSystemLog('VA01-010', 'SUCCESS', `Created Sales Order ${soNumber} for ${customer.name}.`);
+            showToast(`Sales Order <strong>${soNumber}</strong> created! Click Post Invoice (VF01) to bill.`, 'success');
+            renderCurrentModule();
+        }
+
+        function postSalesBilling(soNumber) {
+            const so = erpState.salesOrders.find(s => s.soNumber === soNumber);
+            if (!so || so.status === 'Invoiced') return;
+
+            // Validate stock for all line items
+            for (const item of so.items) {
+                const mat = erpState.materials.find(m => m.code === item.code);
+                if (!mat || mat.stock < item.qty) {
+                    showToast(`Insufficient stock for ${item.name}! Available: ${mat ? mat.stock : 0}, Needed: ${item.qty}.`, 'error');
+                    return;
+                }
+            }
+
+            // Deduct stock from MM
+            so.items.forEach(item => {
+                const mat = erpState.materials.find(m => m.code === item.code);
+                mat.stock -= item.qty;
+            });
+
+            const invNo = `INV-${erpState.counters.inv++}`;
+            so.status = 'Invoiced';
+            so.invoiceNumber = invNo;
+
+            // Post to FICO GL
+            const glDoc = `${erpState.counters.gl++}`;
+            const date = todayISO();
+            erpState.glEntries.push(
+                { docNo: glDoc, date, account: '120100 - Accounts Receivable', type: 'Asset', debit: so.totalAmount, credit: 0, text: `SD Billing ${invNo} (${so.customerName})` },
+                { docNo: glDoc, date, account: '400100 - Domestic Sales Revenue', type: 'Revenue', debit: 0, credit: so.subtotal, text: `Sales Revenue ${invNo}` },
+                { docNo: glDoc, date, account: '220500 - Output GST Payable (18%)', type: 'Liability', debit: 0, credit: so.gstAmount, text: `Output GST 18% ${invNo}` }
+            );
+
+            // Auto-log GSTN E-Invoice in PI/PO Hub
+            erpState.piMessages.unshift({
+                msgId: `IDOC-${77001 + erpState.piMessages.length}`,
+                time: `${date} ${new Date().toTimeString().slice(0,5)}`,
+                interfaceName: 'GSTN_EINVOICE_OUT',
+                direction: 'Outbound',
+                system: 'NIC GST Portal',
+                status: '200 OK',
+                payload: JSON.stringify({ docNo: invNo, customer: so.customerName, taxable: so.subtotal, gst: so.gstAmount })
+            });
+
+            saveState();
+            addSystemLog('VF01-200', 'SUCCESS', `Posted Invoice ${invNo}, deducted stock & created GL ${glDoc}.`);
+            showToast(`Invoice <strong>${invNo}</strong> posted! Stock deducted, FICO GL <strong>${glDoc}</strong> updated & GSTN E-Invoice synced.`, 'success');
+            renderCurrentModule();
+            openGSTInvoiceModal(soNumber);
+        }
+
+        function openGSTInvoiceModal(soNumber) {
+            const so = erpState.salesOrders.find(s => s.soNumber === soNumber);
+            if (!so) return;
+            const cust = erpState.customers.find(c => c.id === so.customerId) || { gstin: '29AAACB0000A1Z5', region: 'India' };
+
+            const modal = document.getElementById('sap-modal');
+            const content = document.getElementById('sap-modal-content');
+            content.innerHTML = `
+                <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
+                    <span class="font-semibold text-sm">SAP Billing Document — ${so.invoiceNumber}</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="window.print()" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i> Print / Save PDF</button>
+                        <button onclick="closeModal()" class="p-1.5 rounded hover:bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+                <div id="printable-area" class="p-6 sm:p-8 overflow-y-auto text-slate-800 space-y-5 bg-white text-xs">
+                    <div class="flex justify-between items-start border-b-2 border-slate-900 pb-4">
+                        <div>
+                            <div class="text-lg font-bold text-slate-900">${erpState.company.name}</div>
+                            <div class="text-slate-600">${erpState.company.city}</div>
+                            <div class="font-mono mt-0.5">GSTIN: ${erpState.company.gstin} | CoCode: ${erpState.company.code}</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-2.5 py-1 bg-slate-900 text-white font-bold rounded uppercase">GST TAX INVOICE</span>
+                            <div class="font-mono mt-1.5"><strong>Invoice:</strong> ${so.invoiceNumber}</div>
+                            <div class="font-mono"><strong>Ref SO:</strong> ${so.soNumber} | <strong>Date:</strong> ${so.date}</div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded border border-slate-200 flex justify-between">
+                        <div>
+                            <div class="text-slate-500 font-bold uppercase mb-1">Bill-To Party</div>
+                            <div class="font-bold text-sm text-slate-900">${so.customerName}</div>
+                            <div>${cust.region} | GSTIN: <span class="font-mono">${cust.gstin}</span></div>
+                        </div>
+                        <div class="text-right font-mono">
+                            <div>IRN Status: <strong>ACTIVE (NIC-GSTN)</strong></div>
+                            <div>Payment Terms: Net 30 Days</div>
+                        </div>
+                    </div>
+                    <table class="w-full border border-slate-300 text-left">
+                        <thead class="bg-slate-100 border-b border-slate-300">
+                            <tr>
+                                <th class="p-2 border-r border-slate-300">Item</th>
+                                <th class="p-2 border-r border-slate-300 text-right">Qty</th>
+                                <th class="p-2 border-r border-slate-300 text-right">Rate</th>
+                                <th class="p-2 border-r border-slate-300 text-right">Disc %</th>
+                                <th class="p-2 text-right">Net Taxable</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            ${so.items.map(it => {
+                                const net = Math.round(it.price * it.qty * (1 - (it.discountPct || 0)/100));
+                                return `
+                                    <tr>
+                                        <td class="p-2 border-r border-slate-300"><strong>${it.name}</strong> <span class="font-mono text-slate-500">(${it.code})</span></td>
+                                        <td class="p-2 border-r border-slate-300 text-right font-mono">${it.qty}</td>
+                                        <td class="p-2 border-r border-slate-300 text-right font-mono">${formatINR(it.price)}</td>
+                                        <td class="p-2 border-r border-slate-300 text-right font-mono">${it.discountPct}%</td>
+                                        <td class="p-2 text-right font-mono font-semibold">${formatINR(net)}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    <div class="flex justify-end">
+                        <div class="w-64 space-y-1">
+                            <div class="flex justify-between"><span>Taxable Value:</span><span class="font-mono">${formatINR(so.subtotal)}</span></div>
+                            <div class="flex justify-between"><span>CGST (9%) + SGST (9%):</span><span class="font-mono">${formatINR(so.gstAmount)}</span></div>
+                            <div class="flex justify-between bg-slate-900 text-white p-2 rounded font-bold text-sm"><span>Grand Total:</span><span class="font-mono">${formatINR(so.totalAmount)}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        /* --------------------------------------------------------------------------
+         * 3. MATERIALS MANAGEMENT (MM — MMBE & ME21N)
+         * -------------------------------------------------------------------------- */
+        function renderMMModule(container) {
+            container.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <!-- Add Material Master (MM01) -->
+                    <div class="sap-card p-5">
+                        <h2 class="font-bold text-base text-slate-900 mb-1">Create Material Master (MM01)</h2>
+                        <p class="text-xs text-slate-500 mb-3">Register Raw Materials or Finished Goods in Plant 1000.</p>
+                        <form onsubmit="handleCreateMaterial(event)" class="grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="block font-semibold mb-1">Material Code</label>
+                                <input type="text" id="mm-code" placeholder="RM-2004" required class="w-full px-3 py-2 font-mono uppercase border border-slate-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block font-semibold mb-1">Material Type</label>
+                                <select id="mm-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                    <option>Raw Material</option>
+                                    <option>Finished Good</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block font-semibold mb-1">Description</label>
+                                <input type="text" id="mm-name" placeholder="e.g. Industrial Optical Encoder" required class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block font-semibold mb-1">Unit Valuation (INR)</label>
+                                <input type="number" id="mm-price" min="1" placeholder="8500" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-semibold mb-1">Init Qty</label>
+                                    <input type="number" id="mm-stock" min="0" value="15" required class="w-full px-2 py-2 font-mono border border-slate-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold mb-1">Reorder</label>
+                                    <input type="number" id="mm-reorder" min="1" value="5" required class="w-full px-2 py-2 font-mono border border-slate-300 rounded-lg">
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <button type="submit" class="sap-btn-primary w-full py-2 rounded-lg font-semibold">Save Material (MM01)</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Create Purchase Order (ME21N) -->
+                    <div class="sap-card p-5">
+                        <h2 class="font-bold text-base text-slate-900 mb-1">Create Vendor Purchase Order (ME21N)</h2>
+                        <p class="text-xs text-slate-500 mb-3">Order materials from suppliers. Post MIGO below to receive stock & trigger QM.</p>
+                        <form onsubmit="handleCreatePO(event)" class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="col-span-2">
+                                <label class="block font-semibold mb-1">Vendor</label>
+                                <select id="po-vendor" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                    ${erpState.vendors.map(v => `<option value="${v.name}">${v.name} (${v.city})</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block font-semibold mb-1">Material</label>
+                                <select id="po-mat" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                    ${erpState.materials.map(m => `<option value="${m.code}">${m.code} - ${m.name} (Stock: ${m.stock})</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-semibold mb-1">Order Qty</label>
+                                <input type="number" id="po-qty" min="1" value="15" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block font-semibold mb-1">Unit Cost (INR)</label>
+                                <input type="number" id="po-cost" min="1" value="9500" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                            </div>
+                            <div class="col-span-2">
+                                <button type="submit" class="sap-btn-primary w-full py-2 rounded-lg font-semibold">Create Purchase Order (ME21N)</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Stock Overview (MMBE) -->
+                <div class="sap-card p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-base text-slate-900">Warehouse Stock Overview (MMBE)</h3>
+                        <button onclick="exportCSV('inventory')" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-xs font-medium"><i class="fa-solid fa-file-csv mr-1"></i> Export Stock CSV</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">SKU</th>
+                                    <th class="p-3">Material Description</th>
+                                    <th class="p-3">Type</th>
+                                    <th class="p-3 text-right">Unit Price</th>
+                                    <th class="p-3 text-right">Stock</th>
+                                    <th class="p-3 text-right">Valuation</th>
+                                    <th class="p-3 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.materials.map(m => {
+                                    const low = m.stock <= m.reorder;
+                                    return `
+                                        <tr class="${low ? 'bg-rose-50/70' : 'hover:bg-slate-50'}">
+                                            <td class="p-3 font-mono font-bold text-blue-700">${m.code}</td>
+                                            <td class="p-3 font-medium text-slate-900">${m.name}</td>
+                                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 text-[11px]">${m.type}</span></td>
+                                            <td class="p-3 font-mono text-right">${formatINR(m.price)}</td>
+                                            <td class="p-3 font-mono text-right font-bold ${low ? 'text-rose-700' : ''}">${m.stock} ${m.uom}</td>
+                                            <td class="p-3 font-mono text-right font-semibold">${formatINR(m.price * m.stock)}</td>
+                                            <td class="p-3 text-center">
+                                                ${low ? `<span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold text-[11px]">Reorder Alert</span>` : `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">Optimal</span>`}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Purchase Orders & MIGO -->
+                <div class="sap-card p-5">
+                    <h3 class="font-bold text-base text-slate-900 mb-3">Purchase Orders & Goods Receipt (MIGO)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">PO Number</th>
+                                    <th class="p-3">Vendor</th>
+                                    <th class="p-3">Material & Qty</th>
+                                    <th class="p-3 text-right">Total Cost</th>
+                                    <th class="p-3 text-center">Status</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.purchaseOrders.slice().reverse().map(po => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3 font-mono font-bold">${po.poNumber}</td>
+                                        <td class="p-3 font-medium">${po.vendorName}</td>
+                                        <td class="p-3">${po.materialName} (×${po.qty})</td>
+                                        <td class="p-3 font-mono text-right font-semibold">${formatINR(po.totalCost)}</td>
+                                        <td class="p-3 text-center">
+                                            <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${po.status === 'Open PO' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${po.status}</span>
+                                        </td>
+                                        <td class="p-3 text-right">
+                                            ${po.status === 'Open PO'
+                                                ? `<button onclick="postMIGO('${po.poNumber}')" class="sap-btn-primary px-2.5 py-1 rounded text-[11px] font-semibold">Post Goods Receipt (MIGO)</button>`
+                                                : `<span class="text-slate-400 font-mono text-[11px]">Mvt 101 Done</span>`
+                                            }
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleCreateMaterial(e) {
+            e.preventDefault();
+            const code = document.getElementById('mm-code').value.trim().toUpperCase();
+            const type = document.getElementById('mm-type').value;
+            const name = document.getElementById('mm-name').value.trim();
+            const price = parseFloat(document.getElementById('mm-price').value);
+            const stock = parseInt(document.getElementById('mm-stock').value);
+            const reorder = parseInt(document.getElementById('mm-reorder').value);
+
+            if (erpState.materials.some(m => m.code === code)) {
+                showToast(`SKU ${code} already exists!`, 'error');
+                return;
+            }
+            erpState.materials.push({ code, name, type, category: 'General', price, cost: price, stock, reorder, uom: 'NOS' });
+            saveState();
+            showToast(`Material <strong>${code}</strong> created in MM.`, 'success');
+            renderCurrentModule();
+        }
+
+        function handleCreatePO(e) {
+            e.preventDefault();
+            const vendorName = document.getElementById('po-vendor').value;
+            const materialCode = document.getElementById('po-mat').value;
+            const qty = parseInt(document.getElementById('po-qty').value);
+            const unitCost = parseFloat(document.getElementById('po-cost').value);
+            const mat = erpState.materials.find(m => m.code === materialCode);
+            if (!mat) return;
+
+            const poNumber = `${erpState.counters.po++}`;
+            erpState.purchaseOrders.push({
+                poNumber,
+                date: todayISO(),
+                vendorName,
+                materialCode: mat.code,
+                materialName: mat.name,
+                qty,
+                unitCost,
+                totalCost: qty * unitCost,
+                status: 'Open PO'
+            });
+            saveState();
+            showToast(`Purchase Order <strong>${poNumber}</strong> created.`, 'success');
+            renderCurrentModule();
+        }
+
+        function postMIGO(poNumber) {
+            const po = erpState.purchaseOrders.find(p => p.poNumber === poNumber);
+            if (!po || po.status !== 'Open PO') return;
+            const mat = erpState.materials.find(m => m.code === po.materialCode);
+            if (mat) mat.stock += po.qty;
+            po.status = 'Received (MIGO)';
+
+            // FICO GL Entry
+            const glDoc = `${erpState.counters.gl++}`;
+            const date = todayISO();
+            erpState.glEntries.push(
+                { docNo: glDoc, date, account: '140100 - Raw Material Inventory', type: 'Asset', debit: po.totalCost, credit: 0, text: `MIGO GR PO ${po.poNumber}` },
+                { docNo: glDoc, date, account: '200100 - Accounts Payable (Vendors)', type: 'Liability', debit: 0, credit: po.totalCost, text: `Vendor Liability PO ${po.poNumber}` }
+            );
+
+            // Auto-create Quality Inspection Lot in QM
+            const lotNo = `QM-${erpState.counters.qm++}`;
+            erpState.qualityLots.push({
+                lotNo,
+                date,
+                sourceRef: `PO ${po.poNumber}`,
+                materialCode: po.materialCode,
+                materialName: po.materialName,
+                qty: po.qty,
+                score: null,
+                decision: 'Pending Inspection'
+            });
+
+            saveState();
+            addSystemLog('MIGO-101', 'SUCCESS', `Goods Receipt PO ${poNumber} posted; QM Lot ${lotNo} generated.`);
+            showToast(`MIGO Posted! Stock +${po.qty}, FICO Doc <strong>${glDoc}</strong> & QM Lot <strong>${lotNo}</strong> created.`, 'success');
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 4. FINANCE & CONTROLLING (FICO — FB50, TRIAL BALANCE & P&L)
+         * -------------------------------------------------------------------------- */
+        function renderFICOModule(container) {
+            const m = getERPMetrics();
+            let totalDebits = 0, totalCredits = 0;
+            erpState.glEntries.forEach(e => { totalDebits += e.debit; totalCredits += e.credit; });
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="sap-card p-4 border-l-4 border-emerald-500">
+                        <div class="text-xs text-slate-500">Total Revenue (P&L)</div>
+                        <div class="text-xl font-bold font-mono text-emerald-700 mt-1">${formatINR(m.revenue)}</div>
+                    </div>
+                    <div class="sap-card p-4 border-l-4 border-rose-500">
+                        <div class="text-xs text-slate-500">Total Expenses & COGS</div>
+                        <div class="text-xl font-bold font-mono text-rose-700 mt-1">${formatINR(m.expense)}</div>
+                    </div>
+                    <div class="sap-card p-4 border-l-4 border-blue-600">
+                        <div class="text-xs text-slate-500">Net Profit</div>
+                        <div class="text-xl font-bold font-mono text-blue-700 mt-1">${formatINR(m.netProfit)}</div>
+                    </div>
+                    <div class="sap-card p-4 border-l-4 border-slate-800">
+                        <div class="text-xs text-slate-500">Trial Balance Check</div>
+                        <div class="text-xs font-mono mt-1">Dr: <strong>${formatINR(totalDebits)}</strong></div>
+                        <div class="text-xs font-mono">Cr: <strong>${formatINR(totalCredits)}</strong></div>
+                    </div>
+                </div>
+
+                <!-- FB50 Journal Entry -->
+                <div class="sap-card p-5">
+                    <h2 class="font-bold text-base text-slate-900 mb-1">Enter G/L Account Document (FB50)</h2>
+                    <p class="text-xs text-slate-500 mb-3">Post manual accounting entries with strict Debit = Credit balance validation.</p>
+                    <form onsubmit="handleFB50Post(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end text-xs">
+                        <div>
+                            <label class="block font-semibold mb-1">Debit G/L Account</label>
+                            <select id="fb-dr" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                <option value="100000 - HDFC Corporate Bank|Asset">100000 - HDFC Corporate Bank (Asset)</option>
+                                <option value="500200 - Admin & Cloud Expense|Expense">500200 - Admin & Cloud Expense (Expense)</option>
+                                <option value="200100 - Accounts Payable (Vendors)|Liability">200100 - Accounts Payable (Liability)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Credit G/L Account</label>
+                            <select id="fb-cr" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                <option value="100000 - HDFC Corporate Bank|Asset">100000 - HDFC Corporate Bank (Asset)</option>
+                                <option value="400200 - Service & Consulting Revenue|Revenue">400200 - Service Revenue (Revenue)</option>
+                                <option value="120100 - Accounts Receivable|Asset">120100 - Accounts Receivable (Asset)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Amount (INR)</label>
+                            <input type="number" id="fb-amt" min="1" placeholder="25000" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Narration</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="fb-txt" placeholder="Journal memo..." required class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                <button type="submit" class="sap-btn-primary px-4 py-2 rounded-lg font-semibold">Post</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- General Ledger Table -->
+                <div class="sap-card p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-base text-slate-900">General Ledger Audit Trail (FBL3N)</h3>
+                        <button onclick="exportCSV('ledger')" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-xs font-medium"><i class="fa-solid fa-file-csv mr-1"></i> Export GL CSV</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">Doc No</th>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">G/L Account</th>
+                                    <th class="p-3">Type</th>
+                                    <th class="p-3">Text</th>
+                                    <th class="p-3 text-right">Debit</th>
+                                    <th class="p-3 text-right">Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.glEntries.slice().reverse().map(g => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 font-mono font-bold text-blue-700">${g.docNo}</td>
+                                        <td class="p-2.5 text-slate-600">${g.date}</td>
+                                        <td class="p-2.5 font-medium text-slate-900">${g.account}</td>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-slate-100 text-[11px]">${g.type}</span></td>
+                                        <td class="p-2.5 text-slate-600">${g.text}</td>
+                                        <td class="p-2.5 font-mono text-right font-semibold">${g.debit > 0 ? formatINR(g.debit) : '-'}</td>
+                                        <td class="p-2.5 font-mono text-right font-semibold text-emerald-700">${g.credit > 0 ? formatINR(g.credit) : '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleFB50Post(e) {
+            e.preventDefault();
+            const [drAcc, drType] = document.getElementById('fb-dr').value.split('|');
+            const [crAcc, crType] = document.getElementById('fb-cr').value.split('|');
+            const amt = parseFloat(document.getElementById('fb-amt').value);
+            const text = document.getElementById('fb-txt').value.trim();
+
+            if (drAcc === crAcc) {
+                showToast('Debit and Credit accounts must be different.', 'error');
+                return;
+            }
+            const docNo = `${erpState.counters.gl++}`;
+            const date = todayISO();
+            erpState.glEntries.push(
+                { docNo, date, account: drAcc, type: drType, debit: amt, credit: 0, text },
+                { docNo, date, account: crAcc, type: crType, debit: 0, credit: amt, text }
+            );
+            saveState();
+            showToast(`FICO Document <strong>${docNo}</strong> posted.`, 'success');
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 5. PRODUCTION PLANNING (PP — CO01 BOM & MANUFACTURING)
+         * -------------------------------------------------------------------------- */
+        function renderPPModule(container) {
+            container.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <!-- Create Production Order (CO01) -->
+                    <div class="sap-card p-5">
+                        <h2 class="font-bold text-base text-slate-900 mb-1">Create Production Order (CO01)</h2>
+                        <p class="text-xs text-slate-500 mb-3">Manufacture Finished Goods from Bill of Materials (BOM). Confirming consumes Raw Materials, adds Finished Stock, and posts COGS to FICO.</p>
+                        <form onsubmit="handleCreateProdOrder(event)" class="space-y-3 text-xs">
+                            <div>
+                                <label class="block font-semibold mb-1">Select Finished Product (BOM)</label>
+                                <select id="pp-bom" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                    ${erpState.boms.map(b => `<option value="${b.bomId}">${b.finishedCode} — ${b.finishedName}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 items-end">
+                                <div>
+                                    <label class="block font-semibold mb-1">Production Quantity</label>
+                                    <input type="number" id="pp-qty" min="1" value="3" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                                </div>
+                                <button type="submit" class="sap-btn-primary py-2.5 px-4 rounded-lg font-semibold">
+                                    <i class="fa-solid fa-gears mr-1"></i> Release Production Order
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Bill of Materials (CS03) -->
+                    <div class="sap-card p-5">
+                        <h3 class="font-bold text-base text-slate-900 mb-2">Active Bills of Materials (CS03)</h3>
+                        <div class="space-y-3 text-xs">
+                            ${erpState.boms.map(b => `
+                                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                                    <div class="font-bold text-slate-900 mb-1">${b.bomId}: ${b.finishedName} (${b.finishedCode})</div>
+                                    <ul class="list-disc list-inside text-slate-600 space-y-0.5">
+                                        ${b.components.map(c => `<li>${c.name} (${c.code}) — <strong>${c.qtyPerUnit} unit(s)</strong></li>`).join('')}
+                                    </ul>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Production Orders List -->
+                <div class="sap-card p-5">
+                    <h3 class="font-bold text-base text-slate-900 mb-3">Shop Floor Production Orders (COOIS)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">Order No</th>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">Finished Material</th>
+                                    <th class="p-3 text-right">Qty</th>
+                                    <th class="p-3 text-right">Mfg Cost</th>
+                                    <th class="p-3 text-center">Status</th>
+                                    <th class="p-3 text-right">Confirmation</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.productionOrders.slice().reverse().map(po => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3 font-mono font-bold text-blue-700">${po.prodNo}</td>
+                                        <td class="p-3 text-slate-600">${po.date}</td>
+                                        <td class="p-3 font-medium">${po.finishedName}</td>
+                                        <td class="p-3 font-mono text-right font-bold">${po.qty} NOS</td>
+                                        <td class="p-3 font-mono text-right">${formatINR(po.totalCost)}</td>
+                                        <td class="p-3 text-center">
+                                            <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${po.status.includes('Confirmed') ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${po.status}</span>
+                                        </td>
+                                        <td class="p-3 text-right">
+                                            ${po.status === 'Released'
+                                                ? `<button onclick="confirmProductionOrder('${po.prodNo}')" class="sap-btn-primary px-2.5 py-1 rounded text-[11px] font-semibold">Confirm Yield (CO11N)</button>`
+                                                : `<span class="text-slate-400 font-mono text-[11px]">Posted to Stock</span>`
+                                            }
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleCreateProdOrder(e) {
+            e.preventDefault();
+            const bomId = document.getElementById('pp-bom').value;
+            const qty = parseInt(document.getElementById('pp-qty').value);
+            const bom = erpState.boms.find(b => b.bomId === bomId);
+            if (!bom) return;
+
+            const finMat = erpState.materials.find(m => m.code === bom.finishedCode);
+            const totalCost = (finMat ? finMat.cost : 25000) * qty;
+            const prodNo = `PROD-${erpState.counters.prod++}`;
+
+            erpState.productionOrders.push({
+                prodNo,
+                date: todayISO(),
+                finishedCode: bom.finishedCode,
+                finishedName: bom.finishedName,
+                qty,
+                totalCost,
+                status: 'Released'
+            });
+            saveState();
+            showToast(`Production Order <strong>${prodNo}</strong> released. Click Confirm Yield (CO11N) to manufacture.`, 'success');
+            renderCurrentModule();
+        }
+
+        function confirmProductionOrder(prodNo) {
+            const po = erpState.productionOrders.find(p => p.prodNo === prodNo);
+            if (!po || po.status !== 'Released') return;
+            const bom = erpState.boms.find(b => b.finishedCode === po.finishedCode);
+            if (!bom) return;
+
+            // Check Raw Material Stock
+            for (const comp of bom.components) {
+                const rm = erpState.materials.find(m => m.code === comp.code);
+                const needed = comp.qtyPerUnit * po.qty;
+                if (!rm || rm.stock < needed) {
+                    showToast(`Shortage of ${comp.name}! Need ${needed}, Available ${rm ? rm.stock : 0}.`, 'error');
+                    return;
+                }
+            }
+
+            // Deduct Raw Materials & Add Finished Goods
+            bom.components.forEach(comp => {
+                const rm = erpState.materials.find(m => m.code === comp.code);
+                rm.stock -= (comp.qtyPerUnit * po.qty);
+            });
+            const fg = erpState.materials.find(m => m.code === po.finishedCode);
+            if (fg) fg.stock += po.qty;
+
+            po.status = 'Confirmed (TECO)';
+
+            // Post Manufacturing Cost to FICO
+            const glDoc = `${erpState.counters.gl++}`;
+            const date = todayISO();
+            erpState.glEntries.push(
+                { docNo: glDoc, date, account: '140200 - Finished Goods Inventory', type: 'Asset', debit: po.totalCost, credit: 0, text: `PP Yield ${po.prodNo} (${po.finishedName})` },
+                { docNo: glDoc, date, account: '500400 - Manufacturing Conversion Cost', type: 'Expense', debit: 0, credit: po.totalCost, text: `PP Settlement ${po.prodNo}` }
+            );
+
+            // Auto-create QM Inspection Lot
+            const lotNo = `QM-${erpState.counters.qm++}`;
+            erpState.qualityLots.push({
+                lotNo,
+                date,
+                sourceRef: po.prodNo,
+                materialCode: po.finishedCode,
+                materialName: po.finishedName,
+                qty: po.qty,
+                score: null,
+                decision: 'Pending Inspection'
+            });
+
+            saveState();
+            showToast(`Production <strong>${prodNo}</strong> confirmed! Raw materials consumed, Finished Stock +${po.qty}, QM Lot <strong>${lotNo}</strong> created.`, 'success');
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 6. QUALITY MANAGEMENT (QM — QA01 INSPECTION LOTS)
+         * -------------------------------------------------------------------------- */
+        function renderQMModule(container) {
+            container.innerHTML = `
+                <div class="sap-card p-5">
+                    <h2 class="font-bold text-base text-slate-900 mb-1">Quality Inspection Worklist (QA32 / QA01)</h2>
+                    <p class="text-xs text-slate-500 mb-4">Inspection lots are automatically triggered from MIGO Goods Receipts and PP Production Runs. Record quality scores and Usage Decisions.</p>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">Inspection Lot</th>
+                                    <th class="p-3">Origin Ref</th>
+                                    <th class="p-3">Material</th>
+                                    <th class="p-3 text-right">Batch Qty</th>
+                                    <th class="p-3 text-center">Quality Score</th>
+                                    <th class="p-3 text-center">Usage Decision</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.qualityLots.slice().reverse().map(lot => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3 font-mono font-bold text-blue-700">${lot.lotNo}<div class="text-[10px] text-slate-400 font-normal">${lot.date}</div></td>
+                                        <td class="p-3 font-mono text-slate-700">${lot.sourceRef}</td>
+                                        <td class="p-3 font-medium">${lot.materialName}</td>
+                                        <td class="p-3 font-mono text-right">${lot.qty} NOS</td>
+                                        <td class="p-3 text-center font-mono font-bold">${lot.score !== null ? `${lot.score}/100` : '-'}</td>
+                                        <td class="p-3 text-center">
+                                            ${lot.decision === 'Pending Inspection'
+                                                ? `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold text-[11px]">Pending</span>`
+                                                : lot.decision.includes('Accepted')
+                                                    ? `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">${lot.decision}</span>`
+                                                    : `<span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-semibold text-[11px]">${lot.decision}</span>`
+                                            }
+                                        </td>
+                                        <td class="p-3 text-right space-x-1">
+                                            ${lot.decision === 'Pending Inspection'
+                                                ? `<button onclick="decideQualityLot('${lot.lotNo}', true)" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold">Accept (99/100)</button>
+                                                   <button onclick="decideQualityLot('${lot.lotNo}', false)" class="px-2.5 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-semibold">Reject</button>`
+                                                : `<span class="text-slate-400 font-mono text-[11px]">UD Closed</span>`
+                                            }
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function decideQualityLot(lotNo, accepted) {
+            const lot = erpState.qualityLots.find(l => l.lotNo === lotNo);
+            if (!lot) return;
+            if (accepted) {
+                lot.score = 99;
+                lot.decision = 'Accepted (Unrestricted)';
+                showToast(`Lot <strong>${lotNo}</strong> passed QA (99/100) and released to Unrestricted Stock.`, 'success');
+            } else {
+                lot.score = 42;
+                lot.decision = 'Rejected (Blocked Stock)';
+                const mat = erpState.materials.find(m => m.code === lot.materialCode);
+                if (mat) mat.stock = Math.max(0, mat.stock - lot.qty);
+                showToast(`Lot <strong>${lotNo}</strong> rejected! ${lot.qty} units moved to Blocked Stock.`, 'error');
+            }
+            saveState();
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 7. EXTENDED WAREHOUSE MANAGEMENT (WM / EWM — LT01 BIN TRANSFERS)
+         * -------------------------------------------------------------------------- */
+        function renderWMModule(container) {
+            container.innerHTML = `
+                <!-- Bin-to-Bin Transfer Order (LT01) -->
+                <div class="sap-card p-5">
+                    <h2 class="font-bold text-base text-slate-900 mb-1">Create Warehouse Transfer Order (LT01)</h2>
+                    <p class="text-xs text-slate-500 mb-3">Move pallets between High-Rack Storage, ESD Cold Storage, and Dispatch Zones.</p>
+                    <form onsubmit="handleWarehouseTransfer(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end text-xs">
+                        <div>
+                            <label class="block font-semibold mb-1">Source Storage Bin</label>
+                            <select id="wm-from" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                ${erpState.warehouseBins.map(b => `<option value="${b.binId}">${b.binId} (${b.materialName} — ${b.qty})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Destination Bin</label>
+                            <select id="wm-to" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                ${erpState.warehouseBins.map(b => `<option value="${b.binId}">${b.binId} — ${b.storageType}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Transfer Quantity</label>
+                            <input type="number" id="wm-qty" min="1" value="4" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                        </div>
+                        <button type="submit" class="sap-btn-primary py-2.5 px-4 rounded-lg font-semibold">
+                            <i class="fa-solid fa-dolly mr-1"></i> Execute Transfer (LT01)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Storage Bin Capacity Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    ${erpState.warehouseBins.map(b => {
+                        const pct = Math.min(100, Math.round((b.qty / b.maxCap) * 100));
+                        return `
+                            <div class="sap-card p-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-mono font-bold text-sm text-blue-700">${b.binId}</span>
+                                    <span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded font-medium">${b.storageType}</span>
+                                </div>
+                                <div class="text-xs font-medium text-slate-800 truncate">${b.materialName}</div>
+                                <div class="mt-3 flex justify-between text-xs font-mono">
+                                    <span>Qty: <strong>${b.qty}</strong> / ${b.maxCap}</span>
+                                    <span>${pct}%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2 mt-1.5 overflow-hidden">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${pct}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function handleWarehouseTransfer(e) {
+            e.preventDefault();
+            const fromId = document.getElementById('wm-from').value;
+            const toId = document.getElementById('wm-to').value;
+            const qty = parseInt(document.getElementById('wm-qty').value);
+
+            if (fromId === toId) {
+                showToast('Source and Destination bins cannot be identical.', 'error');
+                return;
+            }
+            const src = erpState.warehouseBins.find(b => b.binId === fromId);
+            const dst = erpState.warehouseBins.find(b => b.binId === toId);
+            if (!src || !dst || src.qty < qty) {
+                showToast(`Insufficient quantity in bin ${fromId}.`, 'error');
+                return;
+            }
+            src.qty -= qty;
+            dst.qty += qty;
+            dst.materialCode = src.materialCode;
+            dst.materialName = src.materialName;
+
+            const toNo = `TO-${erpState.counters.wm++}`;
+            erpState.wmTransfers.push({ toNo, date: todayISO(), fromBin: fromId, toBin: toId, materialName: src.materialName, qty, status: 'Confirmed' });
+            saveState();
+            showToast(`Transfer Order <strong>${toNo}</strong> confirmed: moved ${qty} units from ${fromId} to ${toId}.`, 'success');
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 8. PROJECT SYSTEM (PS — CJ20N WBS TRACKER)
+         * -------------------------------------------------------------------------- */
+        function renderPSModule(container) {
+            container.innerHTML = `
+                <div class="sap-card p-5">
+                    <h2 class="font-bold text-base text-slate-900 mb-1">Project Builder & WBS Expense Booking (CJ20N)</h2>
+                    <p class="text-xs text-slate-500 mb-3">Book actual project costs against Work Breakdown Structure (WBS) elements and auto-sync to FICO.</p>
+                    <form onsubmit="handleBookWBSExpense(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end text-xs">
+                        <div>
+                            <label class="block font-semibold mb-1">WBS Element</label>
+                            <select id="ps-wbs" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                ${erpState.projects.map(p => `<option value="${p.wbsId}">${p.wbsId} — ${p.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Expense Amount (INR)</label>
+                            <input type="number" id="ps-amt" min="1000" value="45000" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Progress % Update</label>
+                            <input type="number" id="ps-prog" min="1" max="100" value="80" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                        </div>
+                        <button type="submit" class="sap-btn-primary py-2.5 px-4 rounded-lg font-semibold">Post WBS Cost & Sync FICO</button>
+                    </form>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    ${erpState.projects.map(p => {
+                        const util = Math.min(100, Math.round((p.actualSpend / p.budget) * 100));
+                        return `
+                            <div class="sap-card p-5 space-y-3">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="font-mono text-xs font-bold text-blue-700">${p.wbsId}</span>
+                                        <h3 class="font-bold text-base text-slate-900">${p.name}</h3>
+                                        <div class="text-xs text-slate-500">PM: ${p.manager} • Milestone: <strong>${p.milestone}</strong></div>
+                                    </div>
+                                    <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[11px] font-semibold">${p.status}</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs font-mono">
+                                    <div><div class="text-slate-400 text-[10px]">Budget</div><strong>${formatINR(p.budget)}</strong></div>
+                                    <div><div class="text-slate-400 text-[10px]">Actual</div><strong>${formatINR(p.actualSpend)}</strong></div>
+                                    <div><div class="text-slate-400 text-[10px]">Remaining</div><strong class="text-emerald-700">${formatINR(p.budget - p.actualSpend)}</strong></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span>Completion Progress</span>
+                                        <span class="font-mono font-bold">${p.progress}% (Budget Used: ${util}%)</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 rounded-full h-2.5">
+                                        <div class="bg-emerald-600 h-2.5 rounded-full" style="width: ${p.progress}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function handleBookWBSExpense(e) {
+            e.preventDefault();
+            const wbsId = document.getElementById('ps-wbs').value;
+            const amt = parseFloat(document.getElementById('ps-amt').value);
+            const prog = parseInt(document.getElementById('ps-prog').value);
+            const proj = erpState.projects.find(p => p.wbsId === wbsId);
+            if (!proj) return;
+
+            proj.actualSpend += amt;
+            proj.progress = prog;
+            if (prog >= 100) proj.status = 'Completed';
+
+            const glDoc = `${erpState.counters.gl++}`;
+            erpState.glEntries.push(
+                { docNo: glDoc, date: todayISO(), account: '500500 - Capital Project WBS Expense', type: 'Expense', debit: amt, credit: 0, text: `WBS Settlement ${wbsId}` },
+                { docNo: glDoc, date: todayISO(), account: '100000 - HDFC Corporate Bank', type: 'Asset', debit: 0, credit: amt, text: `Project Disbursement ${wbsId}` }
+            );
+            saveState();
+            showToast(`Booked ${formatINR(amt)} to <strong>${wbsId}</strong> & posted FICO Doc <strong>${glDoc}</strong>.`, 'success');
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 9. HUMAN CAPITAL MANAGEMENT (HCM — PA30 & PAYROLL)
+         * -------------------------------------------------------------------------- */
+        function renderHCMModule(container) {
+            const totalPayroll = erpState.employees.reduce((s, e) => s + Math.round((e.baseSalary / e.workingDays) * e.presentDays), 0);
+
+            container.innerHTML = `
+                <div class="sap-card p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-2 border-b border-slate-100">
+                        <div>
+                            <h2 class="font-bold text-base text-slate-900">HR Master Data & Payroll Execution (PA30 / PC00)</h2>
+                            <p class="text-xs text-slate-500">Manage staff attendance, generate Payslip PDFs, and post payroll to FICO.</p>
+                        </div>
+                        <button onclick="executePayrollRun()" class="sap-btn-primary px-4 py-2 rounded-lg text-xs font-semibold">
+                            <i class="fa-solid fa-money-check-dollar mr-1"></i> Run Monthly Payroll (${formatINR(totalPayroll)})
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">Pernr</th>
+                                    <th class="p-3">Employee</th>
+                                    <th class="p-3">Role & Dept</th>
+                                    <th class="p-3 text-right">Monthly CTC</th>
+                                    <th class="p-3 text-center">Attendance</th>
+                                    <th class="p-3 text-right">Net Payable</th>
+                                    <th class="p-3 text-right">Payslip</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.employees.map(emp => {
+                                    const net = Math.round((emp.baseSalary / emp.workingDays) * emp.presentDays);
+                                    return `
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-3 font-mono font-bold text-blue-700">${emp.id}</td>
+                                            <td class="p-3 font-semibold text-slate-900">${emp.name}</td>
+                                            <td class="p-3 text-slate-600">${emp.role} <span class="bg-slate-100 px-1.5 py-0.5 rounded text-[10px]">${emp.dept}</span></td>
+                                            <td class="p-3 font-mono text-right">${formatINR(emp.baseSalary)}</td>
+                                            <td class="p-3 text-center">
+                                                <button onclick="toggleEmpAttendance('${emp.id}')" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${emp.presentToday ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                                    ${emp.presentToday ? 'Present' : 'Absent'} (${emp.presentDays}/${emp.workingDays}d)
+                                                </button>
+                                            </td>
+                                            <td class="p-3 font-mono text-right font-bold">${formatINR(net)}</td>
+                                            <td class="p-3 text-right">
+                                                <button onclick="openPayslipModal('${emp.id}')" class="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-[11px] font-semibold"><i class="fa-solid fa-print mr-1"></i> Payslip</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleEmpAttendance(id) {
+            const emp = erpState.employees.find(e => e.id === id);
+            if (!emp) return;
+            emp.presentToday = !emp.presentToday;
+            emp.presentDays = emp.presentToday ? Math.min(emp.workingDays, emp.presentDays + 1) : Math.max(0, emp.presentDays - 1);
+            saveState();
+            renderCurrentModule();
+        }
+
+        function executePayrollRun() {
+            const total = erpState.employees.reduce((s, e) => s + Math.round((e.baseSalary / e.workingDays) * e.presentDays), 0);
+            const glDoc = `${erpState.counters.gl++}`;
+            erpState.glEntries.push(
+                { docNo: glDoc, date: todayISO(), account: '500300 - Salaries & Payroll Expense', type: 'Expense', debit: total, credit: 0, text: `Monthly Payroll Run (${erpState.employees.length} Staff)` },
+                { docNo: glDoc, date: todayISO(), account: '100000 - HDFC Corporate Bank', type: 'Asset', debit: 0, credit: total, text: `Salary NEFT Disbursement` }
+            );
+            saveState();
+            showToast(`Payroll Run (${formatINR(total)}) posted to FICO Doc <strong>${glDoc}</strong>!`, 'success');
+        }
+
+        function openPayslipModal(id) {
+            const emp = erpState.employees.find(e => e.id === id);
+            if (!emp) return;
+            const gross = Math.round((emp.baseSalary / emp.workingDays) * emp.presentDays);
+            const pf = Math.round(gross * 0.06);
+            const net = gross - pf - 200;
+
+            const modal = document.getElementById('sap-modal');
+            const content = document.getElementById('sap-modal-content');
+            content.innerHTML = `
+                <div class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center">
+                    <span class="font-semibold text-sm">SAP HCM Payslip — ${emp.id}</span>
+                    <div class="flex gap-2">
+                        <button onclick="window.print()" class="px-3 py-1 rounded bg-blue-600 text-xs font-semibold">Print PDF</button>
+                        <button onclick="closeModal()" class="p-1.5 rounded hover:bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+                <div id="printable-area" class="p-6 space-y-4 text-xs bg-white text-slate-800">
+                    <div class="border-b-2 border-slate-900 pb-3 flex justify-between">
+                        <div><div class="text-base font-bold">${erpState.company.name}</div><div>Remuneration Statement — Nov 2026</div></div>
+                        <div class="font-mono text-right"><div><strong>ID:</strong> ${emp.id}</div><div><strong>Days:</strong> ${emp.presentDays}/${emp.workingDays}</div></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded border border-slate-200">
+                        <div><strong>Name:</strong> ${emp.name}</div><div><strong>Dept:</strong> ${emp.dept}</div>
+                        <div><strong>Role:</strong> ${emp.role}</div><div><strong>Gross:</strong> ${formatINR(gross)}</div>
+                    </div>
+                    <div class="bg-slate-900 text-white p-3 rounded flex justify-between font-bold text-sm">
+                        <span>Net Salary Paid (After EPF & PT):</span>
+                        <span class="font-mono">${formatINR(net)}</span>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        /* --------------------------------------------------------------------------
+         * 10. PLANT MAINTENANCE & CRM SERVICE (PM — IW31)
+         * -------------------------------------------------------------------------- */
+        function renderPMModule(container) {
+            container.innerHTML = `
+                <div class="sap-card p-5">
+                    <h2 class="font-bold text-base text-slate-900 mb-1">Create Maintenance & CRM Service Order (IW31)</h2>
+                    <p class="text-xs text-slate-500 mb-3">Dispatch technicians, consume spare parts from MM stock, and bill completed service calls to FICO.</p>
+                    <form onsubmit="handleCreatePMOrder(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end text-xs">
+                        <div>
+                            <label class="block font-semibold mb-1">Customer</label>
+                            <select id="pm-cust" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                ${erpState.customers.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold mb-1">Equipment / Ticket Issue</label>
+                            <input type="text" id="pm-issue" placeholder="e.g. Servo Drive Overheating Diagnostics" required class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Spare Part (MM)</label>
+                            <select id="pm-spare" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                ${erpState.materials.filter(m => m.type === 'Raw Material').map(m => `<option value="${m.code}">${m.code} (${m.stock} left)</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="number" id="pm-fee" value="18000" min="500" required class="w-24 px-2.5 py-2 font-mono border border-slate-300 rounded-lg">
+                            <button type="submit" class="sap-btn-primary flex-1 py-2 px-3 rounded-lg font-semibold">Create</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="sap-card p-5">
+                    <h3 class="font-bold text-base text-slate-900 mb-3">Service & Maintenance Order Queue (IW32)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">Order</th>
+                                    <th class="p-3">Customer</th>
+                                    <th class="p-3">Issue</th>
+                                    <th class="p-3">Spare</th>
+                                    <th class="p-3 text-right">Service Fee</th>
+                                    <th class="p-3 text-center">Status</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.serviceOrders.slice().reverse().map(wo => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3 font-mono font-bold text-blue-700">${wo.orderNo}</td>
+                                        <td class="p-3 font-medium">${wo.customerName}</td>
+                                        <td class="p-3">${wo.issue}</td>
+                                        <td class="p-3 font-mono">${wo.spareCode} (×${wo.spareQty})</td>
+                                        <td class="p-3 font-mono text-right font-semibold">${formatINR(wo.serviceFee)}</td>
+                                        <td class="p-3 text-center">
+                                            <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${wo.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${wo.status}</span>
+                                        </td>
+                                        <td class="p-3 text-right">
+                                            ${wo.status !== 'Completed'
+                                                ? `<button onclick="completePMOrder('${wo.orderNo}')" class="sap-btn-primary px-2.5 py-1 rounded text-[11px] font-semibold">Complete & Bill</button>`
+                                                : `<span class="text-slate-400 font-mono text-[11px]">Closed</span>`
+                                            }
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleCreatePMOrder(e) {
+            e.preventDefault();
+            const customerName = document.getElementById('pm-cust').value;
+            const issue = document.getElementById('pm-issue').value.trim();
+            const spareCode = document.getElementById('pm-spare').value;
+            const serviceFee = parseFloat(document.getElementById('pm-fee').value);
+
+            const orderNo = `PM-${erpState.counters.pm++}`;
+            erpState.serviceOrders.push({
+                orderNo,
+                date: todayISO(),
+                customerName,
+                equipment: 'Industrial Asset',
+                issue,
+                priority: 'High',
+                technician: 'Siddharth Kulkarni',
+                spareCode,
+                spareQty: 1,
+                serviceFee,
+                status: 'In Progress'
+            });
+            saveState();
+            showToast(`Service Order <strong>${orderNo}</strong> created.`, 'success');
+            renderCurrentModule();
+        }
+
+        function completePMOrder(orderNo) {
+            const wo = erpState.serviceOrders.find(w => w.orderNo === orderNo);
+            if (!wo || wo.status === 'Completed') return;
+
+            const spare = erpState.materials.find(m => m.code === wo.spareCode);
+            if (spare && spare.stock >= wo.spareQty) spare.stock -= wo.spareQty;
+
+            wo.status = 'Completed';
+            const glDoc = `${erpState.counters.gl++}`;
+            erpState.glEntries.push(
+                { docNo: glDoc, date: todayISO(), account: '120100 - Accounts Receivable', type: 'Asset', debit: wo.serviceFee, credit: 0, text: `Service Billing ${wo.orderNo}` },
+                { docNo: glDoc, date: todayISO(), account: '400200 - Service & Consulting Revenue', type: 'Revenue', debit: 0, credit: wo.serviceFee, text: `Service Revenue ${wo.orderNo}` }
+            );
+            saveState();
+            showToast(`Service Order <strong>${orderNo}</strong> completed! Spare deducted & FICO Doc <strong>${glDoc}</strong> posted.`, 'success');
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 11. TECHNICAL: ABAP WORKBENCH (SE38 LIVE HANA QUERY RUNNER)
+         * -------------------------------------------------------------------------- */
+        function renderABAPModule(container) {
+            container.innerHTML = `
+                <div class="sap-card p-5 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h2 class="font-bold text-base text-slate-900">ABAP Editor & Open SQL Data Browser (SE38 / SE16N)</h2>
+                            <p class="text-xs text-slate-500">Execute live Open SQL queries against in-memory SAP HANA tables (VBAK, MARA, BKPF, PA0001).</p>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="setABAPSample('VBAK')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 font-mono text-xs">SELECT * FROM VBAK</button>
+                            <button onclick="setABAPSample('MARA')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 font-mono text-xs">SELECT * FROM MARA</button>
+                            <button onclick="setABAPSample('BKPF')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 font-mono text-xs">SELECT * FROM BKPF</button>
+                            <button onclick="setABAPSample('PA0001')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 font-mono text-xs">SELECT * FROM PA0001</button>
+                        </div>
+                    </div>
+
+                    <textarea id="abap-editor" rows="5" class="w-full p-3.5 rounded-lg bg-slate-950 text-emerald-400 font-mono text-xs focus:outline-none">REPORT Z_S4HANA_LIVE_EXTRACT.
+TABLES: VBAK, MARA, BKPF, PA0001.
+SELECT * FROM VBAK INTO TABLE @DATA(lt_sales) UP TO 20 ROWS.
+WRITE: / 'SAP HANA OpenSQL Execution Ready.'.</textarea>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="font-semibold">Target HANA Table:</span>
+                            <select id="abap-table-select" class="px-2.5 py-1.5 border border-slate-300 rounded font-mono bg-white">
+                                <option value="VBAK">VBAK (Sales Documents)</option>
+                                <option value="MARA">MARA (Material Master)</option>
+                                <option value="BKPF">BKPF (FICO Ledger Entries)</option>
+                                <option value="PA0001">PA0001 (HR Employee Master)</option>
+                            </select>
+                        </div>
+                        <button onclick="executeABAPQuery()" class="sap-btn-primary px-5 py-2 rounded-lg text-xs font-semibold">
+                            <i class="fa-solid fa-play mr-1"></i> Syntax Check & Execute (F8)
+                        </button>
+                    </div>
+
+                    <div id="abap-output" class="overflow-x-auto border border-slate-200 rounded-lg p-3 bg-slate-50 text-xs font-mono">
+                        Click "Syntax Check & Execute (F8)" to query live SAP HANA tables...
+                    </div>
+                </div>
+            `;
+        }
+
+        function setABAPSample(tbl) {
+            document.getElementById('abap-table-select').value = tbl;
+            document.getElementById('abap-editor').value = `REPORT Z_EXTRACT_${tbl}.\nTABLES: ${tbl}.\nSELECT * FROM ${tbl} INTO TABLE @DATA(lt_result).\ncl_demo_output=>display( lt_result ).`;
+            executeABAPQuery();
+        }
+
+        function executeABAPQuery() {
+            const tbl = document.getElementById('abap-table-select').value;
+            const out = document.getElementById('abap-output');
+            let rows = [];
+            if (tbl === 'VBAK') rows = erpState.salesOrders.map(s => ({ VBELN: s.soNumber, ERDAT: s.date, KUNNR: s.customerName, NETWR: s.subtotal, MWSBP: s.gstAmount, STAT: s.status }));
+            if (tbl === 'MARA') rows = erpState.materials.map(m => ({ MATNR: m.code, MAKTX: m.name, MTART: m.type, LABST: m.stock, VERPR: m.price }));
+            if (tbl === 'BKPF') rows = erpState.glEntries.map(g => ({ BELNR: g.docNo, BUDAT: g.date, HKONT: g.account, DMBTR_DR: g.debit, DMBTR_CR: g.credit }));
+            if (tbl === 'PA0001') rows = erpState.employees.map(e => ({ PERNR: e.id, ENAME: e.name, PLANS: e.role, ORGEH: e.dept, ANSAL: e.baseSalary }));
+
+            if (!rows.length) {
+                out.innerHTML = '0 records returned.';
+                return;
+            }
+            const headers = Object.keys(rows[0]);
+            out.innerHTML = `
+                <div class="text-emerald-700 font-bold mb-2">✓ ABAP Syntax Check Passed (0 Errors) — ${rows.length} rows fetched from ${tbl} in 3ms</div>
+                <table class="w-full text-left border-collapse bg-white">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-800">${headers.map(h => `<th class="p-2 border border-slate-300">${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(r => `<tr>${headers.map(h => `<td class="p-2 border border-slate-200">${r[h]}</td>`).join('')}</tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+            showToast(`ABAP Report executed against table ${tbl}.`, 'success');
+        }
+
+        /* --------------------------------------------------------------------------
+         * 12. TECHNICAL: BASIS & SECURITY (SM21 / SU01)
+         * -------------------------------------------------------------------------- */
+        function renderBASISModule(container) {
+            container.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div class="sap-card p-4">
+                        <div class="text-xs text-slate-500">SAP HANA In-Memory RAM</div>
+                        <div class="text-xl font-bold font-mono text-blue-700 mt-1">42.8 / 128 GB</div>
+                        <div class="text-[11px] text-emerald-600 mt-1">33.4% Utilized (Healthy)</div>
+                    </div>
+                    <div class="sap-card p-4">
+                        <div class="text-xs text-slate-500">Application Server CPU</div>
+                        <div class="text-xl font-bold font-mono text-slate-900 mt-1">18.4%</div>
+                        <div class="text-[11px] text-slate-500 mt-1">16 vCPUs • Linux SLES 15</div>
+                    </div>
+                    <div class="sap-card p-4">
+                        <div class="text-xs text-slate-500">Active Work Processes</div>
+                        <div class="text-xl font-bold font-mono text-slate-900 mt-1">24 / 32 DIA</div>
+                        <div class="text-[11px] text-slate-500 mt-1">0 Queue Wait Time</div>
+                    </div>
+                    <div class="sap-card p-4">
+                        <div class="text-xs text-slate-500">LocalStorage DB Size</div>
+                        <div class="text-xl font-bold font-mono text-slate-900 mt-1">${(JSON.stringify(erpState).length / 1024).toFixed(1)} KB</div>
+                        <div class="text-[11px] text-emerald-600 mt-1">Auto-Persistence Active</div>
+                    </div>
+                </div>
+
+                <!-- SU01 User Authorization Matrix -->
+                <div class="sap-card p-5">
+                    <h3 class="font-bold text-base text-slate-900 mb-3">SU01 User Maintenance & Role Authorizations</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                    <th class="p-3">SAP User ID</th>
+                                    <th class="p-3">Full Name</th>
+                                    <th class="p-3">Assigned Profile / Role</th>
+                                    <th class="p-3">Last Logon</th>
+                                    <th class="p-3 text-center">Lock Status</th>
+                                    <th class="p-3 text-right">Toggle</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${erpState.basisUsers.map((u, idx) => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3 font-mono font-bold text-blue-700">${u.userId}</td>
+                                        <td class="p-3 font-medium">${u.name}</td>
+                                        <td class="p-3 font-mono text-slate-700">${u.role}</td>
+                                        <td class="p-3 text-slate-500">${u.lastLogin}</td>
+                                        <td class="p-3 text-center">
+                                            <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${u.active ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${u.active ? 'Unlocked' : 'Locked'}</span>
+                                        </td>
+                                        <td class="p-3 text-right">
+                                            <button onclick="toggleBasisUser(${idx})" class="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-[11px] font-semibold">
+                                                ${u.active ? 'Lock User' : 'Unlock User'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SM21 System Log -->
+                <div class="sap-card p-5">
+                    <h3 class="font-bold text-base text-slate-900 mb-3">SM21 Online System Audit Log</h3>
+                    <div class="space-y-1.5 font-mono text-xs max-h-60 overflow-y-auto">
+                        ${erpState.systemLogs.map(l => `
+                            <div class="p-2 rounded bg-slate-50 border border-slate-200 flex items-center gap-3">
+                                <span class="text-slate-400">${l.time}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${l.level === 'SUCCESS' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${l.code}</span>
+                                <span class="text-slate-800">${l.msg}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleBasisUser(idx) {
+            erpState.basisUsers[idx].active = !erpState.basisUsers[idx].active;
+            addSystemLog('SU01-110', 'INFO', `User ${erpState.basisUsers[idx].userId} status changed to ${erpState.basisUsers[idx].active ? 'Unlocked' : 'Locked'}.`);
+            saveState();
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 13. TECHNICAL: BI / BW ANALYTICS (RSA1)
+         * -------------------------------------------------------------------------- */
+        function renderBIModule(container) {
+            const regionTotals = {};
+            erpState.salesOrders.forEach(s => {
+                const reg = s.region || 'South (Bengaluru)';
+                regionTotals[reg] = (regionTotals[reg] || 0) + s.totalAmount;
+            });
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <div class="sap-card p-5">
+                        <h3 class="font-bold text-base text-slate-900 mb-1">Regional Sales Distribution (BW Cube)</h3>
+                        <p class="text-xs text-slate-500 mb-4">Aggregated revenue across Indian sales territories.</p>
+                        <div class="space-y-3 text-xs">
+                            ${Object.entries(regionTotals).map(([reg, val]) => {
+                                const max = Math.max(...Object.values(regionTotals), 1);
+                                const pct = Math.round((val / max) * 100);
+                                return `
+                                    <div>
+                                        <div class="flex justify-between font-medium mb-1">
+                                            <span>${reg}</span>
+                                            <span class="font-mono font-bold">${formatINR(val)}</span>
+                                        </div>
+                                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${pct}%"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="sap-card p-5 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-base text-slate-900 mb-1">Enterprise CSV Data Warehouse Exports</h3>
+                            <p class="text-xs text-slate-500 mb-4">Download clean analytical datasets for Excel, PowerBI, or SAC.</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <button onclick="exportCSV('sales')" class="p-3 rounded-lg border border-slate-200 hover:border-blue-600 hover:bg-blue-50 text-left font-semibold">
+                                <i class="fa-solid fa-file-csv text-blue-600 mr-1.5"></i> Sales & GST Cube
+                            </button>
+                            <button onclick="exportCSV('inventory')" class="p-3 rounded-lg border border-slate-200 hover:border-emerald-600 hover:bg-emerald-50 text-left font-semibold">
+                                <i class="fa-solid fa-file-csv text-emerald-600 mr-1.5"></i> Material Valuation
+                            </button>
+                            <button onclick="exportCSV('ledger')" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-600 hover:bg-indigo-50 text-left font-semibold">
+                                <i class="fa-solid fa-file-csv text-indigo-600 mr-1.5"></i> FICO GL Journal
+                            </button>
+                            <button onclick="exportFullJSONBackup()" class="p-3 rounded-lg border border-slate-200 hover:border-amber-600 hover:bg-amber-50 text-left font-semibold">
+                                <i class="fa-solid fa-database text-amber-600 mr-1.5"></i> Full JSON Snapshot
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* --------------------------------------------------------------------------
+         * 14. TECHNICAL: PI / PO / CPI API INTEGRATION HUB (SXMB_MONI)
+         * -------------------------------------------------------------------------- */
+        function renderPIModule(container) {
+            container.innerHTML = `
+                <div class="sap-card p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h2 class="font-bold text-base text-slate-900">SAP PI / PO / CPI Integration Engine (SXMB_MONI)</h2>
+                            <p class="text-xs text-slate-500">Monitor real-time JSON/XML IDoc interfaces with GSTN E-Invoice, E-Commerce & Banking APIs.</p>
+                        </div>
+                        <button onclick="simulateIDocSync()" class="sap-btn-primary px-4 py-2 rounded-lg text-xs font-semibold">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Trigger Test E-Commerce Order Sync
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        ${erpState.piMessages.map(msg => `
+                            <div class="p-3.5 rounded-lg border border-slate-200 bg-slate-50 text-xs">
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono font-bold text-blue-700">${msg.msgId}</span>
+                                        <span class="font-mono font-semibold text-slate-900">${msg.interfaceName}</span>
+                                        <span class="px-2 py-0.5 rounded bg-slate-200 text-[10px]">${msg.direction} • ${msg.system}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-slate-400 font-mono">${msg.time}</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">${msg.status}</span>
+                                    </div>
+                                </div>
+                                <pre class="p-2.5 rounded bg-slate-900 text-emerald-300 font-mono text-[11px] overflow-x-auto">${msg.payload}</pre>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function simulateIDocSync() {
+            const msgId = `IDOC-${77001 + erpState.piMessages.length}`;
+            erpState.piMessages.unshift({
+                msgId,
+                time: `${todayISO()} ${new Date().toTimeString().slice(0,5)}`,
+                interfaceName: 'ECOMM_WEBHOOK_IN',
+                direction: 'Inbound',
+                system: 'B2B Cloud Store',
+                status: '200 OK',
+                payload: JSON.stringify({ event: 'ORDER_SYNC_PING', timestamp: Date.now(), status: 'PROCESSED_BY_SAP_CPI' })
+            });
+            saveState();
+            showToast(`Inbound IDoc <strong>${msgId}</strong> processed via SAP CPI (200 OK).`, 'success');
+            renderCurrentModule();
+        }
+
+        /* --------------------------------------------------------------------------
+         * 15. INDUSTRY-SPECIFIC SOLUTIONS (IS01 — RETAIL, HEALTHCARE, BANKING, UTILITIES)
+         * -------------------------------------------------------------------------- */
+        function renderISModule(container) {
+            const tabs = [
+                { key: 'RETAIL', label: 'IS-Retail (POS & Store)', icon: 'fa-store' },
+                { key: 'HEALTH', label: 'IS-Healthcare (Hospital)', icon: 'fa-hospital' },
+                { key: 'BANK', label: 'IS-Banking (Core Loans)', icon: 'fa-building-columns' },
+                { key: 'UTIL', label: 'IS-Utilities (Smart Grid)', icon: 'fa-bolt' }
+            ];
+
+            let tabBody = '';
+            if (activeIndustryTab === 'RETAIL') {
+                tabBody = `
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-sm">IS-Retail Point-of-Sale (POS) & Store Replenishment</h3>
+                        <button onclick="addIndustryRecord('RETAIL')" class="sap-btn-primary px-3 py-1.5 rounded-lg text-xs font-semibold">+ New POS Sale</button>
+                    </div>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead><tr class="bg-slate-50 border-b"><th class="p-2.5">POS Tx</th><th class="p-2.5">Store Location</th><th class="p-2.5">Items</th><th class="p-2.5">Mode</th><th class="p-2.5 text-right">Amount</th></tr></thead>
+                        <tbody class="divide-y">${erpState.industryData.retailPos.map(r => `<tr><td class="p-2.5 font-mono font-bold text-blue-700">${r.txId}</td><td class="p-2.5">${r.store}</td><td class="p-2.5">${r.items} SKUs</td><td class="p-2.5">${r.payment}</td><td class="p-2.5 font-mono text-right font-bold">${formatINR(r.amount)}</td></tr>`).join('')}</tbody>
+                    </table>
+                `;
+            } else if (activeIndustryTab === 'HEALTH') {
+                tabBody = `
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-sm">IS-Healthcare Patient Billing & Clinical Management</h3>
+                        <button onclick="addIndustryRecord('HEALTH')" class="sap-btn-primary px-3 py-1.5 rounded-lg text-xs font-semibold">+ Admit / Bill Patient</button>
+                    </div>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead><tr class="bg-slate-50 border-b"><th class="p-2.5">UHID</th><th class="p-2.5">Patient Name</th><th class="p-2.5">Department</th><th class="p-2.5 text-right">Bill Amount</th><th class="p-2.5 text-center">Status</th></tr></thead>
+                        <tbody class="divide-y">${erpState.industryData.healthcarePatients.map(p => `<tr><td class="p-2.5 font-mono font-bold text-blue-700">${p.uhid}</td><td class="p-2.5 font-medium">${p.patient}</td><td class="p-2.5">${p.dept}</td><td class="p-2.5 font-mono text-right font-bold">${formatINR(p.bill)}</td><td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px]">${p.status}</span></td></tr>`).join('')}</tbody>
+                    </table>
+                `;
+            } else if (activeIndustryTab === 'BANK') {
+                tabBody = `
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-sm">IS-Banking Commercial Loans & Liquidity</h3>
+                        <button onclick="addIndustryRecord('BANK')" class="sap-btn-primary px-3 py-1.5 rounded-lg text-xs font-semibold">+ Sanction Credit Line</button>
+                    </div>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead><tr class="bg-slate-50 border-b"><th class="p-2.5">Account No</th><th class="p-2.5">Corporate Client</th><th class="p-2.5">Facility</th><th class="p-2.5">Interest</th><th class="p-2.5 text-right">Exposure</th></tr></thead>
+                        <tbody class="divide-y">${erpState.industryData.bankingAccounts.map(b => `<tr><td class="p-2.5 font-mono font-bold text-blue-700">${b.acctNo}</td><td class="p-2.5 font-medium">${b.holder}</td><td class="p-2.5">${b.type}</td><td class="p-2.5 font-mono">${b.rate}</td><td class="p-2.5 font-mono text-right font-bold">${formatINR(b.balance)}</td></tr>`).join('')}</tbody>
+                    </table>
+                `;
+            } else {
+                tabBody = `
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-sm">IS-Utilities Smart Meter Billing & Grid Status</h3>
+                        <button onclick="addIndustryRecord('UTIL')" class="sap-btn-primary px-3 py-1.5 rounded-lg text-xs font-semibold">+ Log Smart Meter Reading</button>
+                    </div>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead><tr class="bg-slate-50 border-b"><th class="p-2.5">Meter ID</th><th class="p-2.5">Industrial Consumer</th><th class="p-2.5 text-right">Usage (kWh)</th><th class="p-2.5 text-right">Tariff Bill</th><th class="p-2.5 text-center">Grid Status</th></tr></thead>
+                        <tbody class="divide-y">${erpState.industryData.utilitiesMeters.map(u => `<tr><td class="p-2.5 font-mono font-bold text-blue-700">${u.meterNo}</td><td class="p-2.5 font-medium">${u.consumer}</td><td class="p-2.5 font-mono text-right">${u.unitsKwh.toLocaleString()}</td><td class="p-2.5 font-mono text-right font-bold">${formatINR(u.bill)}</td><td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[11px]">${u.status}</span></td></tr>`).join('')}</tbody>
+                    </table>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="sap-card p-5 space-y-4">
+                    <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+                        ${tabs.map(t => `
+                            <button onclick="activeIndustryTab='${t.key}'; renderCurrentModule();" class="px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition ${activeIndustryTab === t.key ? 'sap-btn-primary shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+                                <i class="fa-solid ${t.icon}"></i> ${t.label}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="overflow-x-auto">${tabBody}</div>
+                </div>
+            `;
+        }
+
+        function addIndustryRecord(type) {
+            if (type === 'RETAIL') {
+                erpState.industryData.retailPos.unshift({ txId: `POS-${901 + erpState.industryData.retailPos.length}`, store: 'Hyderabad HITEC City Store', items: 3, amount: 14800, payment: 'UPI / QR' });
+            } else if (type === 'HEALTH') {
+                erpState.industryData.healthcarePatients.unshift({ uhid: `UHID-${4401 + erpState.industryData.healthcarePatients.length}`, patient: 'Suresh Gowda', dept: 'Diagnostics', bill: 16500, status: 'Insured / Cleared' });
+            } else if (type === 'BANK') {
+                erpState.industryData.bankingAccounts.unshift({ acctNo: `LN-${20045110 + erpState.industryData.bankingAccounts.length}`, holder: 'Deccan Precision Tools', type: 'Equipment Loan', balance: 2800000, rate: '8.90%' });
+            } else {
+                erpState.industryData.utilitiesMeters.unshift({ meterNo: `MTR-KA-${7820 + erpState.industryData.utilitiesMeters.length}`, consumer: 'Whitefield Tech Park Tower 3', unitsKwh: 11200, bill: 89600, status: 'Grid Normal' });
+            }
+            saveState();
+            showToast(`New ${type} vertical transaction posted in SAP IS01.`, 'success');
+            renderCurrentModule();
+        }
+
+        /**
+         * ============================================================================
+         * 6. MODALS, CSV / JSON EXPORTS & GLOBAL SEARCH
+         * ============================================================================
+         */
+        function openTCodeCheatSheet() {
+            const modal = document.getElementById('sap-modal');
+            const content = document.getElementById('sap-modal-content');
+            content.innerHTML = `
+                <div class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center">
+                    <span class="font-semibold text-sm"><i class="fa-solid fa-terminal text-blue-400 mr-2"></i>SAP S/4HANA Complete T-Code Directory</span>
+                    <button onclick="closeModal()" class="p-1.5 rounded hover:bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="p-5 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    ${TCODE_DIRECTORY.map(t => `
+                        <button onclick="closeModal(); navigateTo('${t.module}', '${t.code}');" class="p-3 rounded-lg border border-slate-200 hover:border-blue-600 hover:bg-blue-50 text-left flex justify-between items-start transition">
+                            <div>
+                                <div class="font-mono font-bold text-blue-700">${t.code} <span class="text-slate-800 font-sans">— ${t.title}</span></div>
+                                <div class="text-slate-500 text-[11px] mt-0.5">${t.desc}</div>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded font-mono">${t.cat}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        function openSystemNotifications() {
+            const modal = document.getElementById('sap-modal');
+            const content = document.getElementById('sap-modal-content');
+            content.innerHTML = `
+                <div class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center">
+                    <span class="font-semibold text-sm"><i class="fa-solid fa-bell text-emerald-400 mr-2"></i>SAP System & Audit Notifications</span>
+                    <button onclick="closeModal()" class="p-1.5 rounded hover:bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="p-5 overflow-y-auto space-y-2 text-xs font-mono">
+                    ${erpState.systemLogs.map(l => `
+                        <div class="p-2.5 rounded bg-slate-50 border border-slate-200 flex gap-3">
+                            <span class="text-slate-400">${l.time}</span>
+                            <span class="font-bold text-blue-700">${l.code}</span>
+                            <span class="text-slate-800 font-sans">${l.msg}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        function openCompanySettingsModal() {
+            const modal = document.getElementById('sap-modal');
+            const content = document.getElementById('sap-modal-content');
+            content.innerHTML = `
+                <div class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center">
+                    <span class="font-semibold text-sm">SAP Company Code Configuration (OX02)</span>
+                    <button onclick="closeModal()" class="p-1.5 rounded hover:bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <form onsubmit="saveCompanySettings(event)" class="p-5 space-y-3 text-xs">
+                    <div>
+                        <label class="block font-semibold mb-1">Company Name</label>
+                        <input type="text" id="cfg-name" value="${erpState.company.name}" required class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold mb-1">Company Code</label>
+                            <input type="text" id="cfg-code" value="${erpState.company.code}" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">GSTIN</label>
+                            <input type="text" id="cfg-gstin" value="${erpState.company.gstin}" required class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-lg border border-slate-300">Cancel</button>
+                        <button type="submit" class="sap-btn-primary px-4 py-2 rounded-lg font-semibold">Save Profile</button>
+                    </div>
+                </form>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        function saveCompanySettings(e) {
+            e.preventDefault();
+            erpState.company.name = document.getElementById('cfg-name').value.trim();
+            erpState.company.code = document.getElementById('cfg-code').value.trim();
+            erpState.company.gstin = document.getElementById('cfg-gstin').value.trim();
+            saveState();
+            closeModal();
+            navigateTo(currentModule);
+            showToast('Company Code profile updated.', 'success');
+        }
+
+        function openGlobalSearch() {
+            const modal = document.getElementById('sap-modal');
+            const content = document.getElementById('sap-modal-content');
+            content.innerHTML = `
+                <div class="p-4 border-b border-slate-200 flex items-center gap-3">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                    <input type="text" id="global-search-box" oninput="runGlobalSearch(this.value)" placeholder="Search Sales Orders, Materials, Production, GL Docs, Employees..." class="w-full text-sm focus:outline-none">
+                    <button onclick="closeModal()" class="text-xs font-mono bg-slate-100 px-2 py-1 rounded">ESC</button>
+                </div>
+                <div id="global-search-results" class="p-4 max-h-96 overflow-y-auto space-y-2 text-xs">
+                    <div class="text-slate-400 text-center py-6">Type any document number, customer, SKU, or employee name...</div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('global-search-box')?.focus(), 50);
+        }
+
+        function runGlobalSearch(q) {
+            const query = (q || '').trim().toLowerCase();
+            const box = document.getElementById('global-search-results');
+            if (!box || !query) return;
+
+            const hits = [];
+            erpState.salesOrders.forEach(s => { if (s.soNumber.toLowerCase().includes(query) || s.customerName.toLowerCase().includes(query)) hits.push({ mod: 'SD', title: `${s.soNumber} — ${s.customerName}`, sub: formatINR(s.totalAmount) }); });
+            erpState.materials.forEach(m => { if (m.code.toLowerCase().includes(query) || m.name.toLowerCase().includes(query)) hits.push({ mod: 'MM', title: `${m.code} — ${m.name}`, sub: `Stock: ${m.stock}` }); });
+            erpState.productionOrders.forEach(p => { if (p.prodNo.toLowerCase().includes(query) || p.finishedName.toLowerCase().includes(query)) hits.push({ mod: 'PP', title: `${p.prodNo} — ${p.finishedName}`, sub: p.status }); });
+            erpState.employees.forEach(e => { if (e.id.toLowerCase().includes(query) || e.name.toLowerCase().includes(query)) hits.push({ mod: 'HCM', title: `${e.id} — ${e.name}`, sub: e.role }); });
+
+            box.innerHTML = hits.length
+                ? hits.slice(0, 15).map(h => `<button onclick="closeModal(); navigateTo('${h.mod}')" class="w-full text-left p-2.5 rounded-lg hover:bg-blue-50 border border-slate-100 flex justify-between"><div><div class="font-semibold">${h.title}</div><div class="text-slate-500">${h.sub}</div></div><span class="font-mono font-bold text-blue-700">${h.mod}</span></button>`).join('')
+                : `<div class="text-center text-slate-500 py-6">No matching records found.</div>`;
+        }
+
+        function exportCSV(type) {
+            let rows = [];
+            if (type === 'sales') {
+                rows.push(['SO_Number', 'Date', 'Customer', 'Subtotal', 'GST_18', 'Total', 'Status', 'Invoice']);
+                erpState.salesOrders.forEach(s => rows.push([s.soNumber, s.date, `"${s.customerName}"`, s.subtotal, s.gstAmount, s.totalAmount, s.status, s.invoiceNumber || '']));
+            } else if (type === 'inventory') {
+                rows.push(['SKU', 'Description', 'Type', 'Price', 'Stock', 'Valuation']);
+                erpState.materials.forEach(m => rows.push([m.code, `"${m.name}"`, m.type, m.price, m.stock, m.price * m.stock]));
+            } else if (type === 'ledger') {
+                rows.push(['DocNo', 'Date', 'Account', 'Type', 'Debit', 'Credit', 'Text']);
+                erpState.glEntries.forEach(g => rows.push([g.docNo, g.date, `"${g.account}"`, g.type, g.debit, g.credit, `"${g.text}"`]));
+            }
+            const uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(rows.map(r => r.join(',')).join('\n'));
+            const a = document.createElement('a');
+            a.href = uri;
+            a.download = `SAP_${type}_${todayISO()}.csv`;
+            a.click();
+            showToast(`Exported SAP_${type}_${todayISO()}.csv`, 'success');
+        }
+
+        function exportFullJSONBackup() {
+            const uri = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(erpState, null, 2));
+            const a = document.createElement('a');
+            a.href = uri;
+            a.download = `SAP_S4HANA_FULL_BACKUP_${todayISO()}.json`;
+            a.click();
+            showToast('Full SAP S/4HANA JSON database backup downloaded.', 'success');
+        }
+
+        function confirmResetDemo() {
+            const modal = document.getElementById('sap-modal');
+            const content = document.getElementById('sap-modal-content');
+            content.innerHTML = `
+                <div class="p-5 space-y-4">
+                    <h3 class="font-bold text-base text-rose-700"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>Reset SAP S/4HANA Enterprise Database?</h3>
+                    <p class="text-xs sm:text-sm text-slate-600">All custom orders, production runs, quality lots, GL entries, and logs will be restored to default sample data.</p>
+                    <div class="flex justify-end gap-2">
+                        <button onclick="closeModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold">Cancel</button>
+                        <button onclick="executeResetDemo()" class="px-4 py-2 rounded-lg bg-rose-600 text-white text-xs font-semibold">Yes, Reset All</button>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        function executeResetDemo() {
+            erpState = JSON.parse(JSON.stringify(DEFAULT_ERP_DATA));
+            saveState();
+            closeModal();
+            navigateTo('HOME');
+            showToast('All 17 SAP modules reset to default enterprise data.', 'info');
+        }
+
+        function closeModal() {
+            document.getElementById('sap-modal').classList.add('hidden');
+        }
+
+        document.getElementById('sap-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'sap-modal') closeModal();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTheme(currentTheme);
+            navigateTo('HOME');
+        });
+    </script>
+</body>
+</html>
